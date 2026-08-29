@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 **/node_modules/
+**/.next/
 
 # Environment variables
 .env
@@ -41,7 +42,7 @@ pnpm-debug.log*
 coverage/
 
 # Foundry deployment artifacts
-contracts/broadcast/
-
-# Foundry dependencies
-contracts/lib/
+/contracts/broadcast/
+/contracts/cache/
+/contracts/out/
+/contracts/lib/
