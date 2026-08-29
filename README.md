@@ -98,9 +98,9 @@ flowchart TB
         Analytics["Metrics (/analytics)"]
     end
 
-    subgraph Blockchain["⛓️ Base Sepolia (Chain ID: 84532)"]
-        NFT["🐉 ElementalBeastNFT.sol\n(ERC-721 + ERC-2981)"]
-        Market["🏪 Marketplace.sol\n(Non-Custodial + Pull Payments)"]
+    subgraph Blockchain["⛓️ Base Sepolia - Chain ID: 84532"]
+        NFT["🐉 ElementalBeastNFT.sol<br/>ERC-721 + ERC-2981"]
+        Market["🏪 Marketplace.sol<br/>Non-Custodial + Pull Payments"]
     end
 
     subgraph Indexing["📡 Indexing Layer"]
@@ -123,14 +123,14 @@ flowchart TB
     UI --> Activity
     UI --> Analytics
 
-    Mint -->|1. Pin Metadata| IPFS
-    Mint -->|2. mint()| NFT
-    Listings -->|listItem() / cancelListing()| Market
-    Explore -->|buyItem()| Market
-    Collection -->|withdrawProceeds()| Market
+    Mint -->|"1. Pin Metadata"| IPFS
+    Mint -->|"2. mint"| NFT
+    Listings -->|"listItem / cancelListing"| Market
+    Explore -->|"buyItem"| Market
+    Collection -->|"withdrawProceeds"| Market
 
-    NFT -.->|CardMinted / Transfer| Ponder
-    Market -.->|ItemListed / ItemBought / ItemCancelled| Ponder
+    NFT -.->|"CardMinted / Transfer"| Ponder
+    Market -.->|"ItemListed / ItemBought / ItemCancelled"| Ponder
 
     Ponder --> IndexDB
     IndexDB --> TRPC
