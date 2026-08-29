@@ -18,6 +18,12 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
+      - name: Install Foundry Dependencies
+        run: |
+          cd contracts
+          forge install foundry-rs/forge-std --no-commit || true
+          forge install openzeppelin/openzeppelin-contracts --no-commit || true
+
       - name: Run Contract Tests
         run: |
           cd contracts
