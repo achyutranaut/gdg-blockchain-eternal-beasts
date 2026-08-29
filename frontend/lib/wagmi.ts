@@ -7,7 +7,7 @@ import {
   rabbyWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { createConfig, http } from "wagmi";
+import { createConfig, fallback, http } from "wagmi";
 import { baseSepolia, foundry } from "viem/chains";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "3a8170812b534d0ff9d794f19a901d64";
@@ -41,7 +41,11 @@ export const config = createConfig({
   connectors,
   chains: [baseSepolia, foundry],
   transports: {
-    [baseSepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia.base.org"),
+    [baseSepolia.id]: fallback([
+      http(process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia.base.org"),
+      http("https://base-sepolia-rpc.publicnode.com"),
+      http("https://base-sepolia.gateway.tenderly.co"),
+    ]),
     [foundry.id]: http("http://127.0.0.1:8545"),
   },
   ssr: true,
