@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  contracts:
+    name: Smart Contracts Test & Invariant Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run Contract Tests
+        run: |
+          cd contracts
+          forge test -vvv
+
+  frontend:
+    name: Frontend Typecheck, Lint & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Typecheck
+        run: |
+          cd frontend
+          npm run typecheck
+
+      - name: Unit Tests
+        run: |
+          cd frontend
+          npm test
+
+      - name: Production Build
+        run: |
+          cd frontend
+          npm run build

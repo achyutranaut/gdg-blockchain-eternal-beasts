@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="bgPhoenix" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#2e1008"/>
+      <stop offset="60%" stop-color="#140603"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="firePlume" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <filter id="glowPhoenix" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bgPhoenix)"/>
+  <circle cx="400" cy="400" r="280" fill="none" stroke="#f97316" stroke-width="1.5" opacity="0.25"/>
+  <g transform="translate(400, 420)">
+    <!-- Wingspan -->
+    <path d="M0,60 Q-150,-100 -280,-140 Q-180,80 -60,200 Z" fill="#2d0f08" stroke="#f97316" stroke-width="2.5"/>
+    <path d="M0,60 Q150,-100 280,-140 Q180,80 60,200 Z" fill="#2d0f08" stroke="#f97316" stroke-width="2.5"/>
+    <path d="M0,20 Q-130,-70 -220,-100 Q-140,50 -40,150 Z" fill="url(#firePlume)" opacity="0.75" filter="url(#glowPhoenix)"/>
+    <path d="M0,20 Q130,-70 220,-100 Q140,50 40,150 Z" fill="url(#firePlume)" opacity="0.75" filter="url(#glowPhoenix)"/>
+    <!-- Head & Crest -->
+    <polygon points="0,-180 -35,-90 -20,10 20,10 35,-90" fill="#1c0a05" stroke="#f97316" stroke-width="2"/>
+    <polygon points="0,-230 -15,-160 15,-160" fill="#fde047" filter="url(#glowPhoenix)"/>
+    <!-- Beak -->
+    <polygon points="0,-120 -15,-80 0,-30 15,-80" fill="#facc15"/>
+    <!-- Eyes -->
+    <circle cx="-15" cy="-110" r="4" fill="#fef08a" filter="url(#glowPhoenix)"/>
+    <circle cx="15" cy="-110" r="4" fill="#fef08a" filter="url(#glowPhoenix)"/>
+  </g>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="bgBear" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#141c18"/>
+      <stop offset="60%" stop-color="#0b100e"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="bearFur" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <filter id="glowBear" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bgBear)"/>
+  <circle cx="400" cy="400" r="280" fill="none" stroke="#059669" stroke-width="1.5" opacity="0.25"/>
+  <g transform="translate(400, 420)">
+    <!-- Ears -->
+    <circle cx="-110" cy="-140" r="40" fill="#13211b" stroke="#059669" stroke-width="2"/>
+    <circle cx="110" cy="-140" r="40" fill="#13211b" stroke="#059669" stroke-width="2"/>
+    <!-- Head Base -->
+    <path d="M0,-160 C140,-160 180,-20 150,110 C120,200 -120,200 -150,110 C-180,-20 -140,-160 0,-160 Z" fill="#0f1a15" stroke="#10b981" stroke-width="2.5"/>
+    <path d="M0,-120 C100,-120 130,-10 110,80 C90,150 -90,150 -110,80 C-130,-10 -100,-120 0,-120 Z" fill="url(#bearFur)" opacity="0.6"/>
+    <!-- Snout & Nose -->
+    <ellipse cx="0" cy="40" rx="55" ry="40" fill="#08100d" stroke="#059669" stroke-width="1.5"/>
+    <polygon points="0,20 -18,35 18,35" fill="#34d399"/>
+    <!-- Eyes -->
+    <circle cx="-45" cy="-40" r="7" fill="#6ee7b7" filter="url(#glowBear)"/>
+    <circle cx="45" cy="-40" r="7" fill="#6ee7b7" filter="url(#glowBear)"/>
+  </g>
+</svg>

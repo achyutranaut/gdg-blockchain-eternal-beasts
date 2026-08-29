@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#2a0f0a"/>
+      <stop offset="60%" stop-color="#140604"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="ember" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7a45"/>
+      <stop offset="50%" stop-color="#e05338"/>
+      <stop offset="100%" stop-color="#8a1f11"/>
+    </linearGradient>
+    <linearGradient id="furDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d2724"/>
+      <stop offset="100%" stop-color="#181110"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="400" r="280" fill="none" stroke="#e05338" stroke-width="1.5" opacity="0.25"/>
+  <circle cx="400" cy="400" r="320" fill="none" stroke="#ff7a45" stroke-width="0.75" opacity="0.15" stroke-dasharray="8 12"/>
+  <g transform="translate(400, 420)">
+    <!-- Body & Chest -->
+    <path d="M-140,240 L-90,60 L-30,120 L30,120 L90,60 L140,240 Z" fill="url(#furDark)"/>
+    <path d="M-70,180 L0,80 L70,180 L0,240 Z" fill="#261412" stroke="#e05338" stroke-width="1.5" opacity="0.6"/>
+    <!-- Ears -->
+    <polygon points="-110,-120 -150,-240 -50,-150" fill="#1f1412" stroke="#e05338" stroke-width="2"/>
+    <polygon points="-100,-130 -135,-215 -65,-155" fill="url(#ember)" opacity="0.7"/>
+    <polygon points="110,-120 150,-240 50,-150" fill="#1f1412" stroke="#e05338" stroke-width="2"/>
+    <polygon points="100,-130 135,-215 65,-155" fill="url(#ember)" opacity="0.7"/>
+    <!-- Mane / Flame Spikes -->
+    <path d="M-130,-50 L-190,-30 L-135,20 L-180,60 L-120,90 L-160,140 L-90,150" fill="none" stroke="url(#ember)" stroke-width="3" filter="url(#glow)"/>
+    <path d="M130,-50 L190,-30 L135,20 L180,60 L120,90 L160,140 L90,150" fill="none" stroke="url(#ember)" stroke-width="3" filter="url(#glow)"/>
+    <!-- Head Base -->
+    <polygon points="0,-160 -110,-70 -80,50 0,110 80,50 110,-70" fill="url(#furDark)" stroke="#e05338" stroke-width="2.5"/>
+    <!-- Snout & Brow -->
+    <polygon points="0,-100 -45,-30 0,30 45,-30" fill="#140c0b"/>
+    <polygon points="0,30 -30,20 -25,60 0,75 25,60 30,20" fill="url(#ember)"/>
+    <polygon points="0,60 -12,45 12,45" fill="#080808"/>
+    <!-- Eyes -->
+    <polygon points="-55,-40 -25,-30 -45,-15" fill="#ffe066" filter="url(#glow)"/>
+    <polygon points="-50,-37 -30,-30 -42,-20" fill="#ffffff"/>
+    <polygon points="55,-40 25,-30 45,-15" fill="#ffe066" filter="url(#glow)"/>
+    <polygon points="50,-37 30,-30 42,-20" fill="#ffffff"/>
+    <!-- Ember Particles -->
+    <circle cx="-120" cy="-180" r="3" fill="#ff9c6e" filter="url(#glow)"/>
+    <circle cx="140" cy="-160" r="2.5" fill="#ff9c6e" filter="url(#glow)"/>
+    <circle cx="-160" cy="20" r="3.5" fill="#ff7a45" filter="url(#glow)"/>
+    <circle cx="170" cy="40" r="2" fill="#ff7a45" filter="url(#glow)"/>
+    <circle cx="-40" cy="-220" r="2" fill="#ffc069"/>
+    <circle cx="60" cy="-240" r="3" fill="#ff9c6e"/>
+  </g>
+</svg>

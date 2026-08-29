@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 6% 4%;
+    --foreground: 45 10% 96%;
+    --card: 240 5% 6%;
+    --card-foreground: 45 10% 96%;
+    --popover: 240 5% 6%;
+    --popover-foreground: 45 10% 96%;
+    --primary: 20 80% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 45 10% 96%;
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 4% 60%;
+    --accent: 240 4% 16%;
+    --accent-foreground: 45 10% 96%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 14%;
+    --input: 240 4% 14%;
+    --ring: 20 80% 55%;
+    --radius: 0.5rem;
+  }
+
+  body {
+    @apply bg-[#080808] text-[#f4f4f5] antialiased selection:bg-amber-500/20 selection:text-amber-200;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Subtle tactile textures */
+.bg-grid-subtle {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.bg-radial-vignette {
+  background: radial-gradient(circle at 50% 30%, rgba(24, 24, 27, 0.4) 0%, rgba(8, 8, 8, 0.95) 80%);
+}
+
+/* Card Foil and Tactile Styling */
+.card-metallic-bevel {
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 10px 25px -5px rgba(0, 0, 0, 0.5),
+    0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.card-tactile-border {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-tactile-border:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Monospace Micro-labels */
+.type-micro {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Refined custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #202024;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #323238;
+}
+
+/* Prefers-reduced-motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

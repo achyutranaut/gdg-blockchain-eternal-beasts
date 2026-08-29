@@ -1,0 +1,19 @@
+{
+  "network": "baseSepolia",
+  "chainId": 84532,
+  "rpcUrl": "https://sepolia.base.org",
+  "blockExplorer": "https://sepolia.basescan.org",
+  "contracts": {
+    "ElementalBeastNFT": {
+      "address": "0x9cCa84aCE2d3CF4045dB0aAd03c908c7f083cc01",
+      "symbol": "BEAST",
+      "maxRoyaltyBps": 1000,
+      "defaultRoyaltyBps": 500
+    },
+    "Marketplace": {
+      "address": "0xCB509975dCa8C8accCD558DcD08dA9dE6788cCb0",
+      "maxFeeBps": 1000,
+      "protocolFeeBps": 250
+    }
+  }
+}

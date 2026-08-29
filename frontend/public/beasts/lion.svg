@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="bgLion" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#241407"/>
+      <stop offset="60%" stop-color="#120a03"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="maneGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <filter id="glowLion" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bgLion)"/>
+  <circle cx="400" cy="400" r="280" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.25"/>
+  <g transform="translate(400, 420)">
+    <!-- Great Radial Mane -->
+    <polygon points="0,-220 -80,-190 -160,-120 -200,-30 -180,70 -110,160 0,200 110,160 180,70 200,-30 160,-120 80,-190" fill="#241508" stroke="#d97706" stroke-width="2"/>
+    <!-- Inner Mane Flakes -->
+    <polygon points="0,-180 -60,-150 -120,-90 -150,-20 -130,50 -80,120 0,150 80,120 130,50 150,-20 120,-90 60,-150" fill="url(#maneGold)" opacity="0.75"/>
+    <!-- Head -->
+    <polygon points="0,-140 -70,-60 -50,40 0,90 50,40 70,-60" fill="#140b04" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Snout -->
+    <polygon points="0,-40 -30,0 0,40 30,0" fill="#2d1b0d"/>
+    <polygon points="0,25 -10,15 10,15" fill="#080808"/>
+    <!-- Eyes -->
+    <polygon points="-40,-50 -20,-45 -32,-35" fill="#fde047" filter="url(#glowLion)"/>
+    <polygon points="40,-50 20,-45 32,-35" fill="#fde047" filter="url(#glowLion)"/>
+  </g>
+</svg>

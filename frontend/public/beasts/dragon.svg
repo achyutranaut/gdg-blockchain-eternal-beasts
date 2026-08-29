@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <radialGradient id="bgLightning" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#2d2206"/>
+      <stop offset="60%" stop-color="#140f03"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="volt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="glowLightning" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bgLightning)"/>
+  <circle cx="400" cy="400" r="280" fill="none" stroke="#ca8a04" stroke-width="1.5" opacity="0.25"/>
+  <circle cx="400" cy="400" r="320" fill="none" stroke="#fef08a" stroke-width="0.75" opacity="0.15" stroke-dasharray="4 16"/>
+  <g transform="translate(400, 420)">
+    <!-- Horns -->
+    <path d="M-40,-140 Q-120,-240 -180,-260 Q-120,-180 -60,-100 Z" fill="#3a2e0c" stroke="#facc15" stroke-width="2"/>
+    <path d="M40,-140 Q120,-240 180,-260 Q120,-180 60,-100 Z" fill="#3a2e0c" stroke="#facc15" stroke-width="2"/>
+    <!-- Head Base -->
+    <polygon points="0,-180 -80,-80 -50,60 0,130 50,60 80,-80" fill="#1c1607" stroke="#eab308" stroke-width="2.5"/>
+    <polygon points="0,-140 -50,-50 0,30 50,-50" fill="url(#volt)" opacity="0.8"/>
+    <!-- Jaw & Fangs -->
+    <polygon points="0,130 -30,60 30,60" fill="#2d2206"/>
+    <polygon points="-20,60 -15,85 -10,60" fill="#ffffff"/>
+    <polygon points="20,60 15,85 10,60" fill="#ffffff"/>
+    <!-- Eyes -->
+    <polygon points="-45,-60 -20,-50 -35,-35" fill="#fef08a" filter="url(#glowLightning)"/>
+    <polygon points="45,-60 20,-50 35,-35" fill="#fef08a" filter="url(#glowLightning)"/>
+    <!-- Lightning Arcs -->
+    <path d="M-140,-80 L-100,-40 L-120,-10 L-80,40" fill="none" stroke="#fef08a" stroke-width="2" filter="url(#glowLightning)"/>
+    <path d="M140,-80 L100,-40 L120,-10 L80,40" fill="none" stroke="#fef08a" stroke-width="2" filter="url(#glowLightning)"/>
+  </g>
+</svg>

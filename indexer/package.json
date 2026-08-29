@@ -1,0 +1,23 @@
+{
+  "name": "elemental-beasts-indexer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js dev",
+    "start": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js start",
+    "codegen": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js codegen",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ponder/client": "^0.17.8",
+    "dotenv": "^16.4.5",
+    "hono": "^4.13.5",
+    "ponder": "^0.17.8",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5"
+  }
+}
