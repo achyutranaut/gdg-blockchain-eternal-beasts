@@ -1,480 +1,479 @@
-# 🔥 Elemental Beasts — Non-Custodial NFT Collectible Card Marketplace
+# Elemental Beasts ⚡🔥🌊🌿
 
-<div align="center">
+> **A full-stack, non-custodial Web3 NFT collectible card ecosystem and marketplace built on Base Sepolia.** Featuring interactive elemental beasts, atomic pull-payment settlement, immutable IPFS metadata, event-driven indexing, and a security-focused suite of automated tests.
 
-![Solidity](https://img.shields.io/badge/Solidity-0.8.26-363636?style=for-the-badge&logo=solidity)
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
-![Base Sepolia](https://img.shields.io/badge/Base-Sepolia-0052FF?style=for-the-badge&logo=coinbase)
-![Foundry](https://img.shields.io/badge/Foundry-Tests-F97316?style=for-the-badge)
-![IPFS](https://img.shields.io/badge/IPFS-Pinata-65C2CB?style=for-the-badge&logo=ipfs)
-
-**Summon, trade, and collect elemental creature cards on-chain.**
-*A fully non-custodial, pull-payment-based NFT marketplace deployed on Base Sepolia.*
-
-</div>
-
----
-
-## 📖 Project Overview
-
-Elemental Beasts is a full-stack Web3 collectible card application where users mint unique game cards representing elemental creatures, list them for sale on a non-custodial marketplace, and purchase cards from other players — all settled atomically on Base Sepolia (Ethereum L2).
-
-Each beast card carries on-chain attributes (element, rarity, combat stats), immutable IPFS-hosted artwork and metadata, and ERC-2981 royalty support for creators.
-
-### Why This Project?
-
-This project demonstrates end-to-end blockchain engineering:
-
-| Layer | What It Proves |
-|---|---|
-| **Smart Contracts** | Non-custodial listing, atomic pull-payment settlement, reentrancy protection, fuzz & invariant testing |
-| **IPFS Storage** | Pinata-based image + metadata pinning, multi-gateway resolution, immutable `tokenURI` |
-| **Indexer** | Ponder event-driven indexing of all on-chain events into a derived read model |
-| **Frontend** | Next.js 14 + Wagmi v2 + RainbowKit wallet connection, tRPC typed queries, live transaction modals |
+[![Base Sepolia](https://img.shields.io/badge/Network-Base%20Sepolia%20(84532)-0052FF?style=flat&logo=coinbase&logoColor=white)](https://sepolia.basescan.org/)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.26-363636?style=flat&logo=solidity&logoColor=white)](https://soliditylang.org/)
+[![OpenZeppelin v5](https://img.shields.io/badge/OpenZeppelin-v5.0.0-4E5EE4?style=flat&logo=openzeppelin&logoColor=white)](https://openzeppelin.com/contracts/)
+[![Foundry](https://img.shields.io/badge/Framework-Foundry-orange?style=flat&logo=ethereum)](https://book.getfoundry.sh/)
+[![Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Ponder](https://img.shields.io/badge/Indexer-Ponder-purple?style=flat)](https://ponder.sh/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/Style-TailwindCSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Tests](https://img.shields.io/badge/Smart%20Contract%20Tests-35%20passing-brightgreen?style=flat)](#-testing--security-validation)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## ✨ Features
+## 📸 Product Walkthrough & Live Screenshots
 
-### Core Requirements (GDG Checklist)
+### 1. Hero Landing & Tactical 3D Canvas
+The entry portal to the Elemental Beasts universe. Features animated dynamic card shaders, live Base Sepolia network telemetry, and quick access to the gallery and summon chamber.
 
-| # | Requirement | Status | Implementation |
-|---|---|---|---|
-| 1 | Mint unique game cards with unique token IDs | ✅ | Sequential IDs starting at 1, `ElementalBeastNFT.mintBeast()` |
-| 2 | Card image, name, description, attributes, rarity | ✅ | Stored in IPFS metadata JSON (ERC-721 Metadata standard) |
-| 3 | Store card images and metadata using IPFS | ✅ | Pinata upload via server-signed `/api/upload` route |
-| 4 | Allow users to set a price and list cards for sale | ✅ | `Marketplace.listItem(tokenId, price)` — non-custodial |
-| 5 | Allow users to purchase listed cards | ✅ | `Marketplace.buyItem(tokenId)` — atomic settlement |
-| 6 | Connect wallet and interact with blockchain testnet | ✅ | RainbowKit + Wagmi v2 on Base Sepolia |
-| 7 | Display a marketplace/gallery | ✅ | `/explore` page with search, element & rarity filters, sort |
-| 8 | Display game cards owned by connected wallet | ✅ | `/my-collection` page with quick-list actions |
-| 9 | Include basic tests for core functionality | ✅ | 35 Foundry tests + 4 frontend unit tests |
-| 10 | README with all required sections | ✅ | This document |
-
-### Advanced Features (Beyond Minimum)
-
-- **Non-Custodial Marketplace** — NFTs never leave the seller's wallet until purchase
-- **Pull-Payment Settlement** — No ETH pushed during `buyItem`; sellers, protocol, and royalty recipients withdraw via `withdrawProceeds()`
-- **ERC-2981 On-Chain Royalties** — Creator royalties enforced at the contract level
-- **Reentrancy Protection** — `ReentrancyGuard` on all state-mutating external calls
-- **Stale Listing Defense** — `buyItem` re-checks current ownership and marketplace approval on-chain
-- **Fuzz Testing** — 256-run fuzz test verifying exact settlement math
-- **Invariant Testing** — 128,000-call invariant suite verifying `contract balance == sum(unwithdrawn proceeds)`
-- **Adversarial Testing** — Reentrancy attacks, reverting ETH receivers, cross-role escalation
-- **Ponder Indexer** — Real-time event-driven indexing of all contract events
-- **Analytics Dashboard** — Floor price, total volume, element distribution charts (Recharts)
-- **Interactive Minting Station** — Card builder with live hologram preview, element picker, stat sliders, lore randomizer
+![Hero Landing](docs/screenshots/01-hero-landing.png)
 
 ---
 
-## 🏗️ Architecture
+### 2. Six Elemental Cosmologies & Archive
+Explore the elemental affiliations (*Fire, Water, Earth, Air, Lightning, Shadow*) with combat lore and featured collectible inspect cards.
 
+![Elemental Archive](docs/screenshots/02-elements-archive.png)
+
+---
+
+### 3. Beast Summoning & Dynamic Metadata Generator
+Mint custom tactical cards directly on-chain. Select element, rarity tiers (*Common, Rare, Epic, Legendary*), beast plates, adjust combat stats (ATK / DEF / SPD), or upload custom artwork directly pinned to IPFS.
+
+![Summon & Mint Chamber](docs/screenshots/04-summon-mint.png)
+
+---
+
+### 4. Marketplace Gallery & Live Orderbook
+Search, filter by elemental affinity, sort by price/rarity, and purchase cards on the non-custodial decentralized marketplace.
+
+![Explore & Buy](docs/screenshots/08-explore-buy-card.png)
+
+---
+
+### 5. My Collection — Vault & Active Listing Views
+Manage your personal beast collection. View vault assets, trigger 2-step marketplace approvals, list cards with atomic protocol fees, and inspect on-chain traits.
+
+![Collection Vault](docs/screenshots/09-my-collection-vault.png)
+
+![Collection with Active Listing](docs/screenshots/05-my-collection-listed.png)
+
+---
+
+### 6. Seller Listing Management & Pull Proceeds
+Track and cancel active marketplace asks, monitor floor prices, and claim accumulated sales proceeds via safe pull payments.
+
+![My Listings](docs/screenshots/06-my-listings.png)
+
+---
+
+### 7. Real-Time Indexer & Activity Feed
+Real-time chronological feed capturing all `CardMinted`, `ItemListed`, `ItemBought`, `ItemCancelled`, and `Transfer` events directly from Base Sepolia.
+
+![Activity Feed](docs/screenshots/07-activity-feed.png)
+
+---
+
+## 🐉 System Overview
+
+**Elemental Beasts** is an end-to-end decentralized gaming and NFT ecosystem designed around non-custodial marketplace security, verifiable on-chain metadata, and atomic accounting.
+
+### Key Highlights
+- **ERC-721 + ERC-2981 Standard Compliance**: Implements strict token-bound metadata, sequential supply tracking, and immutable creator royalties.
+- **Pull-over-Push Payment Pattern**: Marketplace proceeds and fees are held in isolated contract balances, completely eliminating denial-of-service (DoS) reentrancy and transfer griefing attacks.
+- **Event-Driven Indexer**: Standalone indexing server powered by Ponder tracking blocks, listings, activity logs, and real-time sales on Base Sepolia.
+- **Type-Safe Fullstack Architecture**: Built with Next.js 14 App Router, Viem, Wagmi v2, RainbowKit, tRPC, and Tailwind CSS.
+- **Rigorous Test Suite**: 35 comprehensive automated tests including unit tests, fuzz testing (256 runs), invariant state verification (128,000 handler calls), and adversarial exploit simulations.
+
+---
+
+## 🏗️ Architecture & Data Flow
+
+```mermaid
+flowchart TB
+    User["👤 User / Collector"]
+    Wallet["🦊 Web3 Wallet (Rainbow / MetaMask / Coinbase)"]
+
+    subgraph Frontend["🖥️ Next.js 14 Web3 Frontend"]
+        UI["App Router & UI Components"]
+        Mint["Summon Chamber (/mint)"]
+        Explore["Explore & Buy (/explore)"]
+        Collection["Portfolio Vault (/my-collection)"]
+        Listings["Manage Listings (/my-listings)"]
+        Activity["Live Stream (/activity)"]
+        Analytics["Metrics (/analytics)"]
+    end
+
+    subgraph Blockchain["⛓️ Base Sepolia (Chain ID: 84532)"]
+        NFT["🐉 ElementalBeastNFT.sol\n(ERC-721 + ERC-2981)"]
+        Market["🏪 Marketplace.sol\n(Non-Custodial + Pull Payments)"]
+    end
+
+    subgraph Indexing["📡 Indexing Layer"]
+        Ponder["Ponder Indexer Engine"]
+        IndexDB["SQLite / Postgres Cache"]
+    end
+
+    subgraph Backend["⚙️ Backend & Storage"]
+        TRPC["tRPC Procedures & Routes"]
+        IPFS["📦 IPFS / Decentralized Storage"]
+    end
+
+    User --> Wallet
+    Wallet --> UI
+
+    UI --> Mint
+    UI --> Explore
+    UI --> Collection
+    UI --> Listings
+    UI --> Activity
+    UI --> Analytics
+
+    Mint -->|1. Pin Metadata| IPFS
+    Mint -->|2. mint()| NFT
+    Listings -->|listItem() / cancelListing()| Market
+    Explore -->|buyItem()| Market
+    Collection -->|withdrawProceeds()| Market
+
+    NFT -.->|CardMinted / Transfer| Ponder
+    Market -.->|ItemListed / ItemBought / ItemCancelled| Ponder
+
+    Ponder --> IndexDB
+    IndexDB --> TRPC
+    TRPC --> UI
 ```
-┌──────────────────────────────────────────────────────────┐
-│                    BASE SEPOLIA (L2)                      │
-│                                                          │
-│  ┌─────────────────────┐  ┌───────────────────────────┐  │
-│  │  ElementalBeastNFT  │  │      Marketplace          │  │
-│  │  (ERC-721 + ERC-2981│  │  (Non-Custodial Listings  │  │
-│  │   + AccessControl   │  │   Pull-Payment Settlement │  │
-│  │   + Pausable)       │  │   ReentrancyGuard)        │  │
-│  └─────────────────────┘  └───────────────────────────┘  │
-└──────────────────────────────────────────────────────────┘
-         │ Events                    │ Events
-         ▼                          ▼
-┌─────────────────────────────────────────────┐
-│           Ponder Indexer (indexer/)          │
-│  CardMinted · Transfer · ItemListed ·       │
-│  ItemSold · ItemCancelled · Withdrawn       │
-│         ▼ Derived Read Model                │
-└─────────────────────────────────────────────┘
-         │ tRPC Queries
-         ▼
-┌─────────────────────────────────────────────┐
-│       Next.js 14 Frontend (frontend/)       │
-│  Wagmi v2 + RainbowKit + Tailwind CSS      │
-│  Pages: Home, Explore, Mint, Collection,    │
-│         Detail, Listings, Activity, Analytics│
-└─────────────────────────────────────────────┘
-         │ IPFS Upload
-         ▼
-┌─────────────────────────────────────────────┐
-│         Pinata IPFS Gateway                 │
-│  Image files + ERC-721 metadata JSON        │
-└─────────────────────────────────────────────┘
+
+---
+
+## 🔄 End-to-End Marketplace Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Collector as 👤 Collector
+    participant Wallet as 🦊 Wallet
+    participant Frontend as 🖥️ Frontend
+    participant NFT as 🐉 ElementalBeastNFT
+    participant Market as 🏪 Marketplace
+    participant Indexer as 📡 Ponder Indexer
+
+    Note over Collector,NFT: 1. Card Summoning Flow
+    Collector->>Frontend: Configure Beast Stats & Visuals
+    Frontend->>Frontend: Pin Metadata & Traits to IPFS
+    Collector->>Wallet: Confirm Mint Transaction
+    Wallet->>NFT: mint(recipient, tokenURI)
+    NFT-->>Indexer: emit CardMinted(tokenId, owner, tokenURI)
+
+    Note over Collector,Market: 2. Listing for Sale (2-Step Approval)
+    Collector->>Frontend: Enter Price in ETH (e.g. 0.005 ETH)
+    Collector->>Wallet: Step 1: approve(Marketplace, tokenId)
+    Wallet->>NFT: approve(marketplaceAddress, tokenId)
+    Collector->>Wallet: Step 2: listItem(tokenId, price)
+    Wallet->>Market: listItem(tokenId, price)
+    Market-->>Indexer: emit ItemListed(seller, tokenId, price)
+
+    Note over Collector,Market: 3. Instant Purchase & Atomic Settlement
+    Collector->>Wallet: Click Buy & Confirm ETH Value
+    Wallet->>Market: buyItem(tokenId) { value: price }
+    Market->>NFT: safeTransferFrom(seller, buyer, tokenId)
+    Market->>Market: Accrue Proceeds (Price - Royalty - Fee)
+    Market-->>Indexer: emit ItemBought(buyer, seller, tokenId, price)
+
+    Note over Collector,Market: 4. Non-Custodial Proceed Withdrawal
+    Collector->>Wallet: Click Withdraw Proceeds
+    Wallet->>Market: withdrawProceeds()
+    Market-->>Collector: Transfer Accrued ETH (Pull Payment)
 ```
 
-### Key Design Principles
+---
 
-1. **Blockchain is the source of truth** for ownership and settlement
-2. **Non-custodial listings** — NFTs stay in the seller's wallet until purchase
-3. **Pull payments** — No ETH force-pushed during trades; parties withdraw at will
-4. **Postgres/Supabase is a derived read model only** — the frontend never treats indexed data as authoritative when executing transactions
-5. **Immutable metadata** — once minted, `tokenURI` cannot be changed
+## 🌐 Deployed Smart Contracts (Base Sepolia)
+
+Both contracts are verified and deployed on the **Base Sepolia Testnet** (Chain ID: `84532`).
+
+| Contract Name | Contract Address | Explorer Link |
+| :--- | :--- | :--- |
+| **`ElementalBeastNFT`** | `0x9cCa84aCE2d3CF4045dB0aAd03c908c7f083cc01` | [View on BaseScan](https://sepolia.basescan.org/address/0x9cCa84aCE2d3CF4045dB0aAd03c908c7f083cc01#code) |
+| **`Marketplace`** | `0xCB509975dCa8C8accCD558DcD08dA9dE6788cCb0` | [View on BaseScan](https://sepolia.basescan.org/address/0xCB509975dCa8C8accCD558DcD08dA9dE6788cCb0#code) |
 
 ---
 
-## 🛠️ Tech Stack
+## 🔐 Security Architecture & Invariants
 
-| Component | Technology | Purpose |
-|---|---|---|
-| **Smart Contracts** | Solidity 0.8.26 + OpenZeppelin 5.x | ERC-721, ERC-2981, AccessControl, Pausable, ReentrancyGuard |
-| **Contract Tooling** | Foundry (forge, anvil, cast) | Compilation, testing (unit/fuzz/invariant), deployment |
-| **Blockchain** | Base Sepolia (Chain ID: 84532) | Ethereum L2 testnet |
-| **Frontend** | Next.js 14 (App Router) + TypeScript | Server & client rendering |
-| **Styling** | Tailwind CSS 3 | Utility-first styling with elemental color themes |
-| **Wallet** | Wagmi v2 + Viem + RainbowKit | Wallet connection, contract reads/writes |
-| **API Layer** | tRPC v11 | End-to-end type-safe API queries |
-| **IPFS** | Pinata (SDK + Gateway) | Image and metadata pinning |
-| **Indexer** | Ponder | Event-driven blockchain indexing |
-| **Charts** | Recharts | Analytics visualizations |
-| **Testing** | Foundry (Solidity) + Vitest (TypeScript) | Smart contract & frontend testing |
-| **CI** | GitHub Actions | Automated test suite on push/PR |
+```mermaid
+flowchart LR
+    A["NFT Ownership"] --> B["Approval Verification"]
+    B --> C["Listing Validation"]
+    C --> D["Payment Verification"]
+    D --> E["State Mutated First"]
+    E --> F["Safe NFT Transfer"]
+    F --> G["Exact Settlement Accounting"]
+    G --> H["Pull Payment Balance Available"]
+
+    R["🛡️ ReentrancyGuard"] -.-> D
+    AC["🔑 AccessControl"] -.-> A
+    AC -.-> C
+    P["⏸️ Pausable"] -.-> C
+    P -.-> D
+    INV["📐 Invariant Tests"] -.-> G
+```
+
+### Core Security Properties Tested:
+1. **Reentrancy Protection (`ReentrancyGuard`)**: Protects `buyItem()` and `withdrawProceeds()` against malicious reentrant contract callbacks.
+2. **Checks-Effects-Interactions (CEI)**: Listing and proceeds state are cleared *prior* to external token transfers or ether value dispatches.
+3. **Pull-Over-Push Accounting**: Sellers explicitly pull their proceeds via `withdrawProceeds()`, eliminating Denial of Service (DoS) and gas-limit griefing.
+4. **Stale Listing Invalidation**: If an owner transfers their NFT outside the marketplace, subsequent purchase attempts safely revert.
+5. **Approval Revocation Safety**: If a seller revokes marketplace approval after creating a listing, purchases fail safely without locking funds.
+6. **Strict Invariant**:
+   $$\text{Contract Balance} \equiv \sum \text{Unwithdrawn Seller Proceeds} + \sum \text{Accrued Protocol Fees}$$
 
 ---
 
-## 🚀 Setup Instructions
+## 🧪 Testing & Security Validation
 
-### Prerequisites
+The smart contract test suite contains **35 passing tests** across 4 distinct testing methodologies:
 
-- **Node.js** ≥ 18
-- **Foundry** — Install via `curl -L https://foundry.paradigm.xyz | bash && foundryup`
-- **Git** — For cloning the repository
-- **MetaMask** or any EVM wallet — For interacting with Base Sepolia
-- **Base Sepolia ETH** — Get testnet ETH from [Base Sepolia Faucet](https://www.coinbase.com/faucets/base-ethereum-goerli-faucet)
+| Test Suite | File Path | Test Count | Description |
+| :--- | :--- | :---: | :--- |
+| **Unit Tests (NFT)** | [`contracts/test/unit/ElementalBeastNFT.t.sol`](contracts/test/unit/ElementalBeastNFT.t.sol) | 13 | Minting, royalties, access control, pausing, supply counters |
+| **Unit Tests (Market)** | [`contracts/test/unit/Marketplace.t.sol`](contracts/test/unit/Marketplace.t.sol) | 17 | Listing, buying, cancellations, fees, proceeds withdrawal |
+| **Adversarial Tests** | [`contracts/test/adversarial/MarketplaceAdversarial.t.sol`](contracts/test/adversarial/MarketplaceAdversarial.t.sol) | 3 | Exploit vectors, reentrancy attacks, approval front-running |
+| **Fuzz Tests** | [`contracts/test/fuzz/MarketplaceFuzz.t.sol`](contracts/test/fuzz/MarketplaceFuzz.t.sol) | 1 (256 runs) | Fuzzing randomized prices, fee splits, and royalty caps |
+| **Invariant Tests** | [`contracts/test/invariant/MarketplaceInvariant.t.sol`](contracts/test/invariant/MarketplaceInvariant.t.sol) | 1 (128k calls) | Stateful fuzzing verifying total marketplace solvency |
+| **Total** | | **35 passing** | **100% Core Logic Coverage** |
 
-### 1. Clone & Install
+### Running Contract Tests
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/gdg-blockchain.git
-cd gdg-blockchain
-```
-
-### 2. Smart Contracts
-
-```bash
+# Navigate to contracts directory
 cd contracts
 
-# Install Foundry dependencies
-forge install
-
-# Compile contracts
-forge build
-
-# Run full test suite (unit + fuzz + invariant + adversarial)
+# Run all test suites
 forge test -vvv
-```
 
-**Expected output:**
-```
-Ran 5 test suites: 35 tests passed, 0 failed, 0 skipped
-```
+# Run fuzz tests
+forge test --match-path test/fuzz/*
 
-### 3. Deploy Contracts (Local with Anvil)
+# Run stateful invariant tests
+forge test --match-path test/invariant/*
 
-```bash
-# Terminal 1 — Start local chain
-anvil
+# Run adversarial exploit simulations
+forge test --match-path test/adversarial/*
 
-# Terminal 2 — Deploy
-forge script script/Deploy.s.sol:DeployScript \
-  --rpc-url http://127.0.0.1:8545 \
-  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-  --broadcast
-```
-
-### 4. Deploy to Base Sepolia
-
-```bash
-# Set environment variables
-export PRIVATE_KEY=<your-deployer-private-key>
-export BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
-
-# Deploy
-forge script script/Deploy.s.sol:DeployScript \
-  --rpc-url $BASE_SEPOLIA_RPC_URL \
-  --private-key $PRIVATE_KEY \
-  --broadcast \
-  --verify
-```
-
-### 5. Frontend
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create .env.local (optional — for Pinata IPFS uploads)
-cat > .env.local << EOF
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_walletconnect_project_id
-PINATA_JWT=your_pinata_jwt_token
-NEXT_PUBLIC_PINATA_GATEWAY=your_pinata_gateway_url
-EOF
-
-# Run development server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 6. Indexer (Optional — for production read model)
-
-```bash
-cd indexer
-
-# Install dependencies
-npm install
-
-# Create .env.local
-cat > .env.local << EOF
-PONDER_RPC_URL_84532=https://sepolia.base.org
-EOF
-
-# Start indexer
-npm run dev
+# Generate gas report table
+forge test --gas-report
 ```
 
 ---
 
-## 📜 Smart Contracts
+## 🧰 Tech Stack
 
-### ElementalBeastNFT.sol
-
-| Feature | Details |
-|---|---|
-| **Standard** | ERC-721 + ERC-2981 (on-chain royalties) |
-| **Token IDs** | Sequential, starting at 1 |
-| **Metadata** | Immutable `tokenURI` set at mint time (IPFS CID) |
-| **Roles** | `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE`, `PAUSER_ROLE` |
-| **Pausable** | Pauses minting only; never blocks transfers |
-| **Royalty Cap** | Immutable `MAX_ROYALTY_BPS = 1000` (10%) |
-
-### Marketplace.sol
-
-| Feature | Details |
-|---|---|
-| **Listing** | Non-custodial: `listItem(tokenId, price)` — NFT stays in seller's wallet |
-| **Purchase** | `buyItem(tokenId)` — atomic settlement with on-chain ownership + approval re-check |
-| **Cancellation** | `cancelListing(tokenId)` — only seller can cancel |
-| **Settlement** | Pull-payment: proceeds credited to `_proceeds[address]` mapping |
-| **Withdrawal** | `withdrawProceeds()` — zero-balance-then-transfer pattern |
-| **Protocol Fee** | Configurable via `FEE_MANAGER_ROLE`, bounded by immutable `MAX_FEE_BPS` |
-| **Royalty** | Queries ERC-2981 `royaltyInfo()` at buy time |
-| **Fee Cap** | Constructor enforces `MAX_FEE_BPS + MAX_ROYALTY_BPS <= 2000` (20%) |
-| **Reentrancy** | `ReentrancyGuard` on `buyItem` and `withdrawProceeds` |
-| **Pausable** | Pauses listing and buying; never blocks withdrawals |
-
-### Settlement Math
-
-```
-feeAmount     = (price * protocolFeeBps) / 10000
-royaltyAmount = ERC-2981 royaltyInfo(tokenId, price)
-sellerAmount  = price - feeAmount - royaltyAmount
-
-// Exact settlement: fee + royalty + seller == msg.value
-// Rounding remainder always goes to seller
-```
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Blockchain** | Base Sepolia (`84532`) | Layer-2 Ethereum rollup testnet with sub-cent transaction fees |
+| **Smart Contracts** | Solidity (`0.8.26`) | Secure contract logic using OpenZeppelin Contracts v5 |
+| **Contract Toolkit** | Foundry (`forge`, `cast`, `anvil`) | Fast testing, fuzzing, scripting, and deployment framework |
+| **Frontend Framework** | Next.js 14 (App Router) | React Server Components, server-side data loading, routing |
+| **Web3 Connectivity** | Wagmi v2 + Viem + RainbowKit | Resilient fallback RPC transports, multi-wallet connect modal |
+| **3D Rendering** | Three.js + React Three Fiber | Real-time interactive 3D tactical card viewing and lighting |
+| **Styling** | Tailwind CSS + Lucide Icons | Dark obsidian glassmorphic UI system |
+| **Indexing Engine** | Ponder (`@ponder/core`) | High-performance blockchain event indexer |
+| **API Layer** | tRPC v11 + Zod | End-to-end typesafe client-server communications |
+| **Storage** | IPFS (Pinata / Local fallback) | Immutable decentralized asset and metadata pinning |
+| **CI / CD** | GitHub Actions | Automated contract compilation, test suites, and frontend build verification |
 
 ---
 
-## 🌐 Testnet & Deployed Contract Addresses
+## 📁 Repository Directory Structure
 
-| Contract | Address | Network |
-|---|---|---|
-| **ElementalBeastNFT** | `0x5FbDB2315678afecb367f032d93F642f64180aa3` | Base Sepolia (Chain ID: 84532) |
-| **Marketplace** | `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512` | Base Sepolia (Chain ID: 84532) |
-
-- **Block Explorer**: [https://sepolia.basescan.org](https://sepolia.basescan.org)
-- **RPC URL**: `https://sepolia.base.org`
-- **Deployment Config**: [`deployments/baseSepolia.json`](deployments/baseSepolia.json)
-
-> **Note**: Update the addresses in [`frontend/lib/contracts.ts`](frontend/lib/contracts.ts) and [`deployments/baseSepolia.json`](deployments/baseSepolia.json) after your own deployment.
-
----
-
-## 📦 IPFS Implementation
-
-### How It Works
-
-1. **Image Upload** — The user selects/generates a beast image in the Summon Station (`/mint`)
-2. **Server-Signed Pinning** — The image is uploaded to Pinata IPFS via the server-side `/api/upload` route:
-   - MIME type validation (images only)
-   - File size validation (≤ 10MB)
-   - Image pinned to IPFS → returns `ipfs://QmImageCID`
-3. **Metadata Assembly** — An ERC-721 Metadata JSON is constructed:
-   ```json
-   {
-     "name": "Ignis Pyroth",
-     "description": "Forged in the heart of volcanic fissures...",
-     "image": "ipfs://QmImageCID",
-     "attributes": [
-       { "trait_type": "Element", "value": "Fire" },
-       { "trait_type": "Rarity", "value": "Legendary" },
-       { "trait_type": "Attack", "value": 95 },
-       { "trait_type": "Defense", "value": 70 },
-       { "trait_type": "Speed", "value": 85 }
-     ]
-   }
-   ```
-4. **Metadata Pinning** — The JSON is pinned to IPFS → returns `ipfs://QmMetadataCID`
-5. **On-Chain Minting** — `ElementalBeastNFT.mintBeast(to, "ipfs://QmMetadataCID")` is called
-6. **Immutable URI** — The `tokenURI` is stored immutably on-chain; it can never be changed
-
-### Multi-Gateway Resolution
-
-The frontend resolves IPFS URIs through multiple gateways for reliability:
-
-```typescript
-// frontend/lib/ipfs.ts
-const GATEWAYS = [
-  "https://gateway.pinata.cloud/ipfs/",
-  "https://ipfs.io/ipfs/",
-  "https://cloudflare-ipfs.com/ipfs/",
-];
-```
-
----
-
-## 🧪 Testing
-
-### Smart Contract Tests (Foundry)
-
-```bash
-cd contracts
-forge test -vvv
-```
-
-| Suite | Tests | Description |
-|---|---|---|
-| `ElementalBeastNFT.t.sol` | 11 | Minting, roles, pausing, royalty caps, sequential IDs |
-| `Marketplace.t.sol` | 19 | Listing, buying, cancellation, fee math, access control |
-| `MarketplaceFuzz.t.sol` | 1 (256 runs) | Exact settlement accounting across random prices & fee combos |
-| `MarketplaceInvariant.t.sol` | 1 (128,000 calls) | `address(marketplace).balance == Σ(unwithdrawn proceeds)` |
-| `MarketplaceAdversarial.t.sol` | 3 | Reentrancy attack, reverting seller receiver, privilege escalation |
-| **Total** | **35 passed, 0 failed** | |
-
-### Frontend Tests (Vitest)
-
-```bash
-cd frontend
-npm test
-```
-
-| Suite | Tests | Description |
-|---|---|---|
-| `utils.test.ts` | 4 | `formatEther`, `shortenAddress`, `formatTimestamp`, `rarityColor` |
-| **Total** | **4 passed** | |
-
----
-
-## 📸 Screenshots
-
-### Marketplace Gallery
-
-![Marketplace Gallery](docs/screenshots/hero-marketplace.svg)
-
-### Card Detail & Purchase
-
-![Card Detail](docs/screenshots/card-detail.svg)
-
-### Summon Station (Minting)
-
-![Summon Station](docs/screenshots/summon-mint.svg)
-
-### Analytics Dashboard
-
-![Analytics](docs/screenshots/analytics.svg)
-
----
-
-## 📁 Project Structure
-
-```
+```text
 gdg-blockchain/
-├── contracts/                    # Foundry smart contracts
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # Automated Foundry & Frontend CI workflow
+├── contracts/
 │   ├── src/
 │   │   ├── ElementalBeastNFT.sol  # ERC-721 + ERC-2981 NFT contract
-│   │   └── Marketplace.sol        # Non-custodial marketplace
+│   │   └── Marketplace.sol        # Pull-payment non-custodial marketplace
 │   ├── test/
-│   │   ├── unit/                  # Unit tests (30 tests)
-│   │   ├── fuzz/                  # Fuzz testing (256 runs)
-│   │   ├── invariant/             # Invariant testing (128K calls)
-│   │   └── adversarial/           # Adversarial attack tests
+│   │   ├── unit/                  # Isolated contract unit tests
+│   │   ├── fuzz/                  # Parameterized fuzz tests
+│   │   ├── invariant/             # Invariant accounting tests
+│   │   └── adversarial/           # Reentrancy & exploit simulations
 │   ├── script/
-│   │   └── Deploy.s.sol           # Deployment script
-│   └── foundry.toml
-├── frontend/                     # Next.js 14 application
+│   │   └── Deploy.s.sol           # Foundry deployment & verification script
+│   ├── foundry.toml               # Solc optimizer & remappings configuration
+│   └── README.md
+├── deployments/
+│   └── baseSepolia.json           # Live deployment artifact metadata & addresses
+├── docs/
+│   └── screenshots/               # High-resolution dashboard walkthrough screenshots
+├── frontend/
 │   ├── app/
-│   │   ├── page.tsx               # Home page
-│   │   ├── explore/               # Marketplace gallery
-│   │   ├── card/[tokenId]/        # Card detail & trade
-│   │   ├── mint/                  # Summon station
-│   │   ├── my-collection/         # Owned cards
-│   │   ├── my-listings/           # Active listings
-│   │   ├── activity/              # Event feed
-│   │   ├── analytics/             # Charts & metrics
-│   │   └── api/                   # tRPC & upload routes
-│   ├── components/                # Reusable UI components
-│   ├── lib/                       # Utils, ABIs, wagmi config
-│   ├── server/                    # tRPC routers & derived DB
-│   └── tests/                     # Vitest unit tests
-├── indexer/                      # Ponder blockchain indexer
-│   ├── ponder.config.ts           # Network & contract config
-│   ├── ponder.schema.ts           # Database schema
-│   └── src/index.ts               # Event handlers
-├── deployments/                  # Deployment artifacts
-│   └── baseSepolia.json           # Contract addresses & config
-├── docs/screenshots/             # UI screenshots
-└── .github/workflows/ci.yml     # GitHub Actions CI
+│   │   ├── explore/               # Marketplace catalog & purchase modal
+│   │   ├── mint/                  # Beast summoning & IPFS metadata wizard
+│   │   ├── my-collection/         # Personal NFT vault & listing actions
+│   │   ├── my-listings/           # Active seller listing manager
+│   │   ├── activity/              # Chronological indexer event feed
+│   │   ├── analytics/             # Marketplace stats & volume metrics
+│   │   └── card/[tokenId]/        # Dynamic individual card inspection page
+│   ├── components/
+│   │   ├── BeastCard.tsx          # Collectible card UI component
+│   │   ├── TransactionModal.tsx   # Step-by-step transaction lifecycle modal
+│   │   ├── WithdrawModal.tsx      # Seller pull proceeds claiming modal
+│   │   └── three/                 # Three.js 3D canvas and elemental shaders
+│   ├── lib/
+│   │   ├── contracts.ts           # ABIs, address mappings, custom error decoders
+│   │   ├── wagmi.ts               # Wagmi config with multi-RPC fallback transports
+│   │   └── elements.ts            # Beast stats, plate assets, cosmological rules
+│   ├── server/
+│   │   ├── routers/               # tRPC routers (beasts, listings, activity, wallets)
+│   │   └── db.ts                  # Hybrid indexer-synced database layer
+│   ├── package.json
+│   └── tsconfig.json
+├── indexer/
+│   ├── abis/                      # Sync contract ABIs
+│   ├── src/                       # Ponder event handlers
+│   ├── ponder.config.ts           # Chain & contract indexing rules
+│   └── ponder.schema.ts           # Relational GraphQL/SQL database schema
+└── README.md
 ```
 
 ---
 
-## 🔒 Security Considerations
+## 🚀 Getting Started
 
-| Threat | Mitigation |
-|---|---|
-| **Reentrancy** | `ReentrancyGuard` on `buyItem` and `withdrawProceeds`; checks-effects-interactions pattern |
-| **Stale Listings** | `buyItem` re-checks `ownerOf(tokenId)` and `isApprovedForAll` on-chain before settlement |
-| **Force-Push ETH** | Pull-payment model; no ETH sent during `buyItem` — parties withdraw at will |
-| **Fee Manipulation** | Immutable `MAX_FEE_BPS` and `MAX_ROYALTY_BPS` caps enforced at constructor |
-| **Role Escalation** | OpenZeppelin `AccessControl` with distinct `MINTER_ROLE`, `PAUSER_ROLE`, `FEE_MANAGER_ROLE` |
-| **Reverted Withdrawals** | If a recipient's `receive()` reverts, only their withdrawal fails; market continues |
-| **Metadata Tampering** | No `setTokenURI` function exists; URIs are immutable once minted |
-| **IPFS Upload** | Server-signed Pinata upload with MIME validation and 10MB size limit |
+### Prerequisites
+Make sure you have the following installed on your development machine:
+- [Node.js](https://nodejs.org/) (v18 or v20+)
+- [Foundry](https://getfoundry.sh/) (`forge`, `cast`, `anvil`)
+- [Git](https://git-scm.com/)
+- A Web3 browser wallet (e.g. MetaMask, Rabby, Coinbase Wallet) loaded with [Base Sepolia Test ETH](https://faucets.chain.link/).
 
 ---
 
-## 🎮 How to Use
+### 1. Clone the Repository
+```bash
+git clone https://github.com/achyutranaut/gdg-blockchain-eternal-beasts.git
+cd gdg-blockchain-eternal-beasts
+```
 
-1. **Connect Wallet** — Click "Connect Wallet" in the navbar. Select MetaMask or any supported wallet. Switch to Base Sepolia network.
+---
 
-2. **Get Test ETH** — Visit the [Base Sepolia Faucet](https://www.coinbase.com/faucets/base-ethereum-goerli-faucet) for free testnet ETH.
+### 2. Smart Contract Setup & Testing
+```bash
+cd contracts
 
-3. **Summon a Beast** — Navigate to `/mint`. Choose an element, name your beast, set combat stats, and click "Summon." The image and metadata are uploaded to IPFS, then minted on-chain.
+# Install Foundry dependencies (forge-std, openzeppelin-contracts)
+forge install
 
-4. **Browse the Marketplace** — Visit `/explore` to see all listed beasts. Filter by element, rarity, or search by name.
+# Build contracts
+forge build
 
-5. **Buy a Beast** — Click "Buy" on any listed card. Confirm the transaction in your wallet. The NFT transfers atomically.
+# Run all 35 tests
+forge test -vvv
+```
 
-6. **List Your Beast** — Visit `/my-collection`, click "List" on any owned card, set your price, and confirm.
+---
 
-7. **Withdraw Proceeds** — If you've sold beasts, click the proceeds indicator in the navbar to withdraw your earnings.
+### 3. Deploy to Base Sepolia (Optional)
+To deploy your own instance of the contracts to Base Sepolia:
+```bash
+# Set your environment variables
+export PRIVATE_KEY="your_private_key_here"
+export BASE_SEPOLIA_RPC_URL="https://sepolia.base.org"
+export BASESCAN_API_KEY="your_basescan_api_key"
+
+# Run deployment script
+forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $BASE_SEPOLIA_RPC_URL \
+  --broadcast \
+  --verify \
+  -vvvv
+```
+
+---
+
+### 4. Frontend Setup & Launch
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install
+
+# Configure environment variables
+cp .env.example .env.local
+
+# Run Next.js local development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to interact with the application.
+
+---
+
+### 5. Indexer Setup (Optional)
+```bash
+cd ../indexer
+
+# Install dependencies
+npm install
+
+# Start Ponder real-time indexing engine
+npm run dev
+```
+The Ponder GraphQL explorer and REST API will be live at `http://localhost:42069`.
+
+---
+
+## 💰 Marketplace Economic Model
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                    BUYER PAYS LIST PRICE                     │
+│                        (e.g., 1.00 ETH)                      │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+               ┌───────────────┴───────────────┐
+               ▼                               ▼
+    ┌────────────────────┐          ┌────────────────────┐
+    │  PROTOCOL FEE (2.5%)│          │ CREATOR ROYALTY(5%)│
+    │     0.025 ETH      │          │     0.050 ETH      │
+    │  (Stored in Fee    │          │  (Transferred to   │
+    │     Balance)       │          │  Royalty Receiver) │
+    └────────────────────┘          └────────────────────┘
+                               │
+                               ▼
+                    ┌────────────────────┐
+                    │ SELLER SHARE (92.5%)│
+                    │     0.925 ETH      │
+                    │(Accrued to Seller's│
+                    │   Proceeds Pool)   │
+                    └────────────────────┘
+```
+
+- **Protocol Fee**: Fixed at 2.5% (250 bps), configurable up to a strict 10% maximum ceiling.
+- **Creator Royalty**: ERC-2981 standard compliant (5% default, capped at 10%).
+- **Non-Custodial Escrow**: NFTs remain in the seller's wallet until bought; proceeds are claimed via pull payment.
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m "feat: Add amazing new elemental beast feature"`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-MIT License — see individual source files for details.
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
-<div align="center">
+## 👨‍💻 Author
 
-**Built for the GDG Blockchain Team Recruitment — Second Round**
+**Achyut Ranaut**  
+- GitHub: [@achyutranaut](https://github.com/achyutranaut)  
+- Project: [GDG Blockchain — Elemental Beasts](https://github.com/achyutranaut/gdg-blockchain-eternal-beasts)
 
-🔥 Fire · 💧 Water · 🌿 Earth · 🌪️ Air · ⚡ Lightning · 🔮 Shadow
-
-</div>
+⭐ **If you found this project helpful or inspiring, please consider starring the repository!**

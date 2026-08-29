@@ -137,7 +137,7 @@ export default function MyCollectionPage() {
   const filteredBeasts = ownedBeasts.filter((beast) => {
     const isListed = activeListingMap.has(beast.tokenId);
     if (filter === "listed") return isListed;
-    if (filter === "collection") return !isListed;
+    // Both 'all' and 'collection' include all cards owned by the user (listed or unlisted)
     return true;
   });
 
@@ -220,7 +220,7 @@ export default function MyCollectionPage() {
             filter === "collection" ? "bg-obsidian-800 text-ivory-100 font-bold border border-zinc-700" : "text-zinc-400 hover:text-ivory-200"
           }`}
         >
-          IN COLLECTION ({ownedBeasts.length - activeListingMap.size})
+          IN COLLECTION ({ownedBeasts.length})
         </button>
         <button
           onClick={() => setFilter("listed")}
