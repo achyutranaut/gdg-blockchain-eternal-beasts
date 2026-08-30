@@ -46,3 +46,7 @@ coverage/
 /contracts/cache/
 /contracts/out/
 /contracts/lib/
+
+indexer/.env
+indexer/.env.local
+indexer/.ponder/

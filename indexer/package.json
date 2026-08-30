@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js dev",
-    "start": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js start",
+    "start": "node node_modules/ponder/dist/esm/bin/ponder.js start",
     "codegen": "node --env-file=.env node_modules/ponder/dist/esm/bin/ponder.js codegen",
     "typecheck": "tsc --noEmit"
   },
