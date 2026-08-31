@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ELEMENTS, RARITIES, BeastElement, BeastRarity } from "@/lib/elements";
-import { resolveIpfsUrl } from "@/lib/ipfs";
+import { useIpfsImage } from "@/lib/useIpfsImage";
 import { formatEther } from "@/lib/utils";
 
 export interface PhysicalBeastCardProps {
@@ -35,24 +35,18 @@ export function PhysicalBeastCard({
   priority = true,
   className = "",
 }: PhysicalBeastCardProps) {
-  const isLocalPath = (url: string) => {
-    const resolved = resolveIpfsUrl(url);
-    return resolved.startsWith("/") || resolved.startsWith("data:") || resolved.startsWith("blob:");
-  };
-
-  const [imgSrc, setImgSrc] = useState(() => resolveIpfsUrl(imageUrl));
-  const [isLoaded, setIsLoaded] = useState(() => isLocalPath(imageUrl));
+  const { src: imgSrc, onError: retryImage } = useIpfsImage(imageUrl);
+  const [isLoaded, setIsLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [transformStyle, setTransformStyle] = useState("");
   const [glareStyle, setGlareStyle] = useState({ opacity: 0, x: 50, y: 50 });
 
   // Sync image source instantly on prop changes without tearing DOM
   useEffect(() => {
-    const resolved = resolveIpfsUrl(imageUrl);
-    setImgSrc(resolved);
+    const isLocalPath = imgSrc.startsWith("/") || imgSrc.startsWith("data:") || imgSrc.startsWith("blob:");
     // Local assets render instantly — skip shimmer; remote assets need loading state
-    setIsLoaded(isLocalPath(imageUrl));
-  }, [imageUrl]);
+    setIsLoaded(isLocalPath);
+  }, [imgSrc]);
 
   const elementInfo = ELEMENTS[element] || ELEMENTS.Fire;
   const rarityInfo = RARITIES[rarity] || RARITIES.Common;
@@ -155,8 +149,7 @@ export function PhysicalBeastCard({
             unoptimized={imgSrc.endsWith(".svg")}
             onLoad={() => setIsLoaded(true)}
             onError={() => {
-              setImgSrc("/placeholder-beast.svg");
-              setIsLoaded(true);
+              retryImage();
             }}
             className={`object-cover object-center transform hover:scale-105 transition-all duration-300 ${
               isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -168,8 +161,7 @@ export function PhysicalBeastCard({
             alt={name}
             onLoad={() => setIsLoaded(true)}
             onError={() => {
-              setImgSrc("/placeholder-beast.svg");
-              setIsLoaded(true);
+              retryImage();
             }}
             className={`w-full h-full object-cover object-center transform hover:scale-105 transition-all duration-300 ${
               isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"

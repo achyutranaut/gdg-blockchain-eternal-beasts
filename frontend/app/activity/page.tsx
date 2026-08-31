@@ -5,7 +5,12 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { formatEther, shortenAddress, formatTimestamp } from "@/lib/utils";
-import { resolveIpfsUrl } from "@/lib/ipfs";
+import { useIpfsImage } from "@/lib/useIpfsImage";
+
+function ActivityArtwork({ image, alt }: { image?: string; alt: string }) {
+  const { src, onError } = useIpfsImage(image);
+  return <img src={src} alt={alt} onError={onError} className="h-full w-full object-cover" />;
+}
 
 export default function ActivityPage() {
   const [filterType, setFilterType] = useState<string>("ALL");
@@ -80,11 +85,9 @@ export default function ActivityPage() {
 
                 {/* Beast Thumbnail */}
                 <div className="h-10 w-10 rounded bg-obsidian-950 overflow-hidden border border-zinc-800 shrink-0">
-                  <img
-                    src={resolveIpfsUrl(item.beast?.image)}
+                  <ActivityArtwork
+                    image={item.beast?.image}
                     alt={item.beast?.name || "Beast"}
-                    onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder-beast.svg"; }}
-                    className="h-full w-full object-cover"
                   />
                 </div>
 

@@ -7,8 +7,13 @@ import { XCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { getContractAddresses, MARKETPLACE_ABI, decodeContractError } from "@/lib/contracts";
 import { formatEther } from "@/lib/utils";
-import { resolveIpfsUrl } from "@/lib/ipfs";
+import { useIpfsImage } from "@/lib/useIpfsImage";
 import { TransactionModal, TxStep } from "@/components/TransactionModal";
+
+function ListingArtwork({ image, alt }: { image?: string; alt: string }) {
+  const { src, onError } = useIpfsImage(image);
+  return <img src={src} alt={alt} onError={onError} className="h-full w-full object-cover" />;
+}
 
 export default function MyListingsPage() {
   const { address, isConnected, chainId } = useAccount();
@@ -104,11 +109,9 @@ export default function MyListingsPage() {
             >
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 rounded bg-obsidian-950 overflow-hidden border border-zinc-800 shrink-0">
-                  <img
-                    src={resolveIpfsUrl(beast?.image)}
+                  <ListingArtwork
+                    image={beast?.image}
                     alt={beast?.name || "Beast"}
-                    onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder-beast.svg"; }}
-                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>

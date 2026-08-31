@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { BeastRecord, ListingRecord } from "../server/db";
 import { ELEMENTS, RARITIES, BeastElement, BeastRarity } from "../lib/elements";
-import { resolveIpfsUrl } from "../lib/ipfs";
+import { useIpfsImage } from "../lib/useIpfsImage";
 import { formatEther, cn, shortenAddress } from "../lib/utils";
 
 interface BeastCardProps {
@@ -17,10 +17,7 @@ interface BeastCardProps {
 
 export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardProps) {
   // A minted NFT's metadata image is authoritative. Never infer its artwork from its name.
-  const [imgSrc, setImgSrc] = useState(() => resolveIpfsUrl(beast.image));
-  useEffect(() => {
-    setImgSrc(resolveIpfsUrl(beast.image));
-  }, [beast.image]);
+  const { src: imgSrc, onError: retryImage } = useIpfsImage(beast.image);
   const cardRef = useRef<HTMLDivElement>(null);
   const [transformStyle, setTransformStyle] = useState("");
   const [glareStyle, setGlareStyle] = useState({ opacity: 0, x: 50, y: 50 });
@@ -113,7 +110,7 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         <img
           src={imgSrc}
           alt={beast.name}
-          onError={() => setImgSrc("/placeholder-beast.svg")}
+          onError={retryImage}
           className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
       </Link>

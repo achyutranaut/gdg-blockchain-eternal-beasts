@@ -1,8 +1,9 @@
 export const IPFS_GATEWAYS = [
+  // Minted assets are pinned through Pinata, so use its gateway first.
+  "https://gateway.pinata.cloud/ipfs/",
   "https://ipfs.io/ipfs/",
   "https://dweb.link/ipfs/",
   "https://cloudflare-ipfs.com/ipfs/",
-  "https://gateway.pinata.cloud/ipfs/",
 ];
 
 /**

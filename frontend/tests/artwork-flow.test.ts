@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { mergeIndexerBeast, type BeastRecord } from "../server/db";
 import { BEAST_ARTWORK_MAP } from "../lib/elements";
 import { BEAST_IPFS_CIDS } from "../lib/ipfs-cids";
-import { resolveIpfsUrl } from "../lib/ipfs";
+import { IPFS_GATEWAYS, resolveIpfsUrl } from "../lib/ipfs";
 
 const beast = (overrides: Partial<BeastRecord> = {}): BeastRecord => ({
   tokenId: "6",
@@ -34,6 +34,10 @@ describe("minted NFT artwork integrity", () => {
     expect(resolveIpfsUrl("ipfs://custom-image-cid")).toContain("custom-image-cid");
   });
 
+  it("prefers Pinata for pinned artwork before trying mirror gateways", () => {
+    expect(IPFS_GATEWAYS[0]).toBe("https://gateway.pinata.cloud/ipfs/");
+  });
+
   it("uses a neutral placeholder, never Wolf, for a missing image", () => {
     expect(resolveIpfsUrl("")).toBe("/placeholder-beast.svg");
   });
@@ -55,7 +59,7 @@ describe("minted NFT artwork integrity", () => {
     const cardSource = readFileSync("components/BeastCard.tsx", "utf8");
     expect(cardSource).not.toContain("BEAST_ARTWORK_MAP");
     expect(cardSource).not.toContain('"/beasts/wolf.svg"');
-    expect(cardSource).toContain("resolveIpfsUrl(beast.image)");
+    expect(cardSource).toContain("useIpfsImage(beast.image)");
   });
 
   it("posts the explicit selected artwork ID to the upload route", () => {
