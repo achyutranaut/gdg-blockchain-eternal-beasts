@@ -41,7 +41,8 @@ export default function SummonPage() {
   const [selectedElement, setSelectedElement] = useState<BeastElement>("Fire");
   const [selectedRarity, setSelectedRarity] = useState<BeastRarity>("Rare");
   const [selectedBeast, setSelectedBeast] = useState<string>("WOLF");
-  const [selectedPlateIndex, setSelectedPlateIndex] = useState<number>(0);
+  // This is the selected built-in asset, not an inference from a beast name at render time.
+  const [selectedArtworkId, setSelectedArtworkId] = useState<string>("WOLF");
   const [customArtworkUrl, setCustomArtworkUrl] = useState<string | null>(null);
   const [customFile, setCustomFile] = useState<File | null>(null);
 
@@ -157,13 +158,18 @@ export default function SummonPage() {
   }, [isSuccess, receipt]);
 
   const elementInfo = ELEMENTS[selectedElement] || ELEMENTS.Fire;
+  const selectedPlateIndex = useMemo(
+    () => elementInfo.sampleImages.findIndex(
+      (image) => image === BEAST_ARTWORK_MAP[selectedArtworkId]
+    ),
+    [elementInfo.sampleImages, selectedArtworkId]
+  );
 
   // Derive active artwork for the live preview card
   const activeArtworkUrl = useMemo(() => {
     if (customArtworkUrl) return customArtworkUrl;
-    const samplePlates = elementInfo.sampleImages || [];
-    return samplePlates[selectedPlateIndex] || samplePlates[0] || BEAST_ARTWORK_MAP[selectedBeast] || "/beasts/wolf.svg";
-  }, [customArtworkUrl, elementInfo, selectedPlateIndex, selectedBeast]);
+    return BEAST_ARTWORK_MAP[selectedArtworkId] || "/placeholder-beast.svg";
+  }, [customArtworkUrl, selectedArtworkId]);
 
   // Handle Beast selection
   const handleSelectBeast = (beastName: string) => {
@@ -173,14 +179,7 @@ export default function SummonPage() {
     if (customArtworkUrl) {
       return;
     }
-    const beastArtwork = BEAST_ARTWORK_MAP[beastName];
-    if (beastArtwork) {
-      const plateIdx = elementInfo.sampleImages.indexOf(beastArtwork);
-
-      if (plateIdx >= 0) {
-        setSelectedPlateIndex(plateIdx);
-      }
-    }
+    if (BEAST_ARTWORK_MAP[beastName]) setSelectedArtworkId(beastName);
   };
 
   // Handle Element selection
@@ -189,16 +188,17 @@ export default function SummonPage() {
     const targetElementInfo = ELEMENTS[elem];
     if (targetElementInfo?.defaultCreature) {
       setSelectedBeast(targetElementInfo.defaultCreature);
-    }
-    // Don't change the selected plate while custom artwork is active.
-    if (!customArtworkUrl) {
-      setSelectedPlateIndex(0);
+      if (!customArtworkUrl) setSelectedArtworkId(targetElementInfo.defaultCreature);
     }
   };
 
   // Handle Plate Selection
   const handleSelectPlate = (idx: number) => {
-    setSelectedPlateIndex(idx);
+    const artworkId = Object.entries(BEAST_ARTWORK_MAP).find(
+      ([, path]) => path === elementInfo.sampleImages[idx]
+    )?.[0];
+    if (!artworkId) return;
+    setSelectedArtworkId(artworkId);
     if (customArtworkUrl && customArtworkUrl.startsWith("blob:")) {
       URL.revokeObjectURL(customArtworkUrl);
     }
@@ -245,15 +245,9 @@ export default function SummonPage() {
         // Custom artwork
         formData.append("file", customFile);
       } else {
-        // Built-in artwork
-        //
-        // IMPORTANT:
-        // The upload route validates this against the built-in artwork manifest.
-        const builtinArtworkId = Object.entries(BEAST_ARTWORK_MAP).find(
-          ([, path]) => path === activeArtworkUrl
-        )?.[0];
-
-        if (!builtinArtworkId) {
+        // The selected asset ID is posted directly and validated against the
+        // built-in artwork manifest by the upload route.
+        if (!BEAST_ARTWORK_MAP[selectedArtworkId]) {
           setIsUploadingToIpfs(false);
 
           alert(
@@ -263,7 +257,7 @@ export default function SummonPage() {
           return;
         }
 
-        formData.append("builtinArtworkId", builtinArtworkId);
+        formData.append("builtinArtworkId", selectedArtworkId);
       }
 
       formData.append("name", selectedBeast);
@@ -470,7 +464,11 @@ export default function SummonPage() {
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">04 ARTWORK & PLATE</span>
                 <span className="text-xs text-zinc-400 font-mono">
-                  {customArtworkUrl ? "CUSTOM UPLOAD" : `PLATE ${selectedPlateIndex + 1}`}
+                  {customArtworkUrl
+                    ? "CUSTOM UPLOAD"
+                    : selectedPlateIndex >= 0
+                      ? `PLATE ${selectedPlateIndex + 1}`
+                      : `${selectedArtworkId} ARTWORK`}
                 </span>
               </div>
 

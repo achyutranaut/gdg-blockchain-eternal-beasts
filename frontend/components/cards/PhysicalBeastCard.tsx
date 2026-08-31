@@ -155,7 +155,7 @@ export function PhysicalBeastCard({
             unoptimized={imgSrc.endsWith(".svg")}
             onLoad={() => setIsLoaded(true)}
             onError={() => {
-              setImgSrc("/beasts/wolf.svg");
+              setImgSrc("/placeholder-beast.svg");
               setIsLoaded(true);
             }}
             className={`object-cover object-center transform hover:scale-105 transition-all duration-300 ${
@@ -168,7 +168,7 @@ export function PhysicalBeastCard({
             alt={name}
             onLoad={() => setIsLoaded(true)}
             onError={() => {
-              setImgSrc("/beasts/wolf.svg");
+              setImgSrc("/placeholder-beast.svg");
               setIsLoaded(true);
             }}
             className={`w-full h-full object-cover object-center transform hover:scale-105 transition-all duration-300 ${

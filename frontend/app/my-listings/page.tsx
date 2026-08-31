@@ -8,7 +8,6 @@ import { trpc } from "@/lib/trpc";
 import { getContractAddresses, MARKETPLACE_ABI, decodeContractError } from "@/lib/contracts";
 import { formatEther } from "@/lib/utils";
 import { resolveIpfsUrl } from "@/lib/ipfs";
-import { BEAST_ARTWORK_MAP } from "@/lib/elements";
 import { TransactionModal, TxStep } from "@/components/TransactionModal";
 
 export default function MyListingsPage() {
@@ -106,9 +105,9 @@ export default function MyListingsPage() {
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 rounded bg-obsidian-950 overflow-hidden border border-zinc-800 shrink-0">
                   <img
-                    src={resolveIpfsUrl(beast?.image || BEAST_ARTWORK_MAP[beast?.name || ""] || "/beasts/wolf.svg")}
+                    src={resolveIpfsUrl(beast?.image)}
                     alt={beast?.name || "Beast"}
-                    onError={(e) => { (e.target as HTMLImageElement).src = "/beasts/wolf.svg"; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder-beast.svg"; }}
                     className="h-full w-full object-cover"
                   />
                 </div>

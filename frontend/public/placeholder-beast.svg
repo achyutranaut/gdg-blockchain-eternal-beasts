@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Artwork unavailable</title>
+  <desc id="desc">A neutral Elemental Beasts placeholder.</desc>
+  <rect width="800" height="1000" fill="#08080a"/>
+  <path d="M400 190 610 310v240L400 670 190 550V310Z" fill="none" stroke="#52525b" stroke-width="16"/>
+  <path d="M400 300v260M288 365l224 130M512 365 288 495" stroke="#3f3f46" stroke-width="12"/>
+  <text x="400" y="790" text-anchor="middle" fill="#a1a1aa" font-family="monospace" font-size="28" letter-spacing="5">ARTWORK UNAVAILABLE</text>
+</svg>

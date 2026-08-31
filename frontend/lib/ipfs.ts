@@ -10,7 +10,7 @@ export const IPFS_GATEWAYS = [
  * Passes through local paths (/beasts/*.svg), data URIs, blob URIs, and HTTP URLs unchanged.
  */
 export function resolveIpfsUrl(uri: string | undefined, gatewayIndex = 0): string {
-  if (!uri || uri.trim() === "") return "/placeholder-card.png";
+  if (!uri || uri.trim() === "") return "/placeholder-beast.svg";
 
   // Local asset paths — pass through unchanged
   if (uri.startsWith("/")) return uri;

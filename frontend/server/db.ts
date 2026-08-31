@@ -59,6 +59,31 @@ const INDEXER_URLS = [
   "http://localhost:42070",
 ].filter(Boolean) as string[];
 
+const hasText = (value: unknown): value is string =>
+  typeof value === "string" && value.trim() !== "";
+
+/**
+ * The browser writes complete metadata immediately after a confirmed mint. The
+ * indexer may briefly be unable to fetch newly pinned IPFS metadata, so an
+ * incomplete indexer response must not erase that known-good metadata.
+ */
+export function mergeIndexerBeast(
+  existing: BeastRecord | undefined,
+  incoming: BeastRecord
+): BeastRecord {
+  if (!existing) return incoming;
+
+  return {
+    ...existing,
+    ...incoming,
+    tokenUri: hasText(incoming.tokenUri) ? incoming.tokenUri : existing.tokenUri,
+    name: hasText(incoming.name) ? incoming.name : existing.name,
+    description: hasText(incoming.description) ? incoming.description : existing.description,
+    image: hasText(incoming.image) ? incoming.image : existing.image,
+    traits: incoming.traits.length > 0 ? incoming.traits : existing.traits,
+  };
+}
+
 // Read model database syncing with Ponder indexer API and providing local fallback
 class ReadModelDatabase {
   private beasts: Map<string, BeastRecord> = new Map();
@@ -78,8 +103,9 @@ class ReadModelDatabase {
         if (res.ok) {
           const beastsData: any[] = await res.json();
           for (const b of beastsData) {
-            this.beasts.set(String(b.tokenId), {
-              tokenId: String(b.tokenId),
+            const tokenId = String(b.tokenId);
+            const incoming: BeastRecord = {
+              tokenId,
               owner: b.owner,
               tokenUri: b.tokenUri || "",
               name: b.name || `Beast #${b.tokenId}`,
@@ -94,7 +120,8 @@ class ReadModelDatabase {
               mintedAtBlock: Number(b.mintedAtBlock) || 0,
               mintedTxHash: b.mintedTxHash || "",
               updatedAt: Number(b.updatedAt) || Date.now(),
-            });
+            };
+            this.beasts.set(tokenId, mergeIndexerBeast(this.beasts.get(tokenId), incoming));
           }
 
           // Fetch listings

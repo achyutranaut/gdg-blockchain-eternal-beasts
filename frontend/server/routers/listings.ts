@@ -30,7 +30,7 @@ export const listingsRouter = router({
               tokenUri: "",
               name: `Beast #${listing.tokenId}`,
               description: "Elemental creature",
-              image: "/placeholder-card.png",
+              image: "/placeholder-beast.svg",
               element: "Fire",
               rarity: "Common",
               attack: 50,
