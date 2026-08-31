@@ -476,4 +476,10 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 - GitHub: [@achyutranaut](https://github.com/achyutranaut)  
 - Project: [GDG Blockchain — Elemental Beasts](https://github.com/achyutranaut/gdg-blockchain-eternal-beasts)
 
+
+## 🚀 Live Demo
+**[Elemental Beasts — Base Sepolia](https://gdg-blockchain-eternal-beasts.vercel.app/)**
+
+Deployed on Vercel and connected to Base Sepolia.
+
 ⭐ **If you found this project helpful or inspiring, please consider starring the repository!**
