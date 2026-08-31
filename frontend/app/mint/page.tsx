@@ -147,6 +147,7 @@ export default function SummonPage() {
   };
 
   // Submit flow: Client validation -> /api/upload -> mint()
+  // Submit flow: Client validation -> /api/upload -> mint()
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -162,7 +163,21 @@ export default function SummonPage() {
       if (customFile) {
         formData.append("file", customFile);
       } else {
-        formData.append("customImageUrl", activeArtworkUrl);
+        // activeArtworkUrl is a local /beasts/*.svg path — resolve it back to
+        // the canonical creature key that BEAST_IPFS_CIDS (and route.ts) expects.
+        const builtinBeastId = Object.entries(BEAST_ARTWORK_MAP).find(
+          ([, path]) => path === activeArtworkUrl
+        )?.[0];
+
+        if (!builtinBeastId) {
+          alert(
+            "Couldn't match the selected artwork to a pinned built-in beast. Try selecting a different plate, or upload a custom image."
+          );
+          setIsUploadingToIpfs(false);
+          return;
+        }
+
+        formData.append("builtinBeast", builtinBeastId);
       }
 
       formData.append("name", selectedBeast);
@@ -172,6 +187,8 @@ export default function SummonPage() {
       formData.append("attack", String(attack));
       formData.append("defense", String(defense));
       formData.append("speed", String(speed));
+
+      // ...rest unchanged
 
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -283,11 +300,10 @@ export default function SummonPage() {
                     key={elem.name}
                     type="button"
                     onClick={() => handleSelectElement(elem.name)}
-                    className={`py-2.5 px-2 rounded border text-center transition-all ${
-                      selectedElement === elem.name
+                    className={`py-2.5 px-2 rounded border text-center transition-all ${selectedElement === elem.name
                         ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
                         : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                      }`}
                   >
                     <span className="text-xs block font-bold" style={{ color: elem.color }}>
                       {elem.name.toUpperCase()}
@@ -314,11 +330,10 @@ export default function SummonPage() {
                     key={r}
                     type="button"
                     onClick={() => setSelectedRarity(r)}
-                    className={`py-2 px-3 rounded border text-xs transition-all text-center ${
-                      selectedRarity === r
+                    className={`py-2 px-3 rounded border text-xs transition-all text-center ${selectedRarity === r
                         ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
                         : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                      }`}
                   >
                     {r.toUpperCase()}
                   </button>
@@ -338,11 +353,10 @@ export default function SummonPage() {
                     key={c}
                     type="button"
                     onClick={() => handleSelectBeast(c)}
-                    className={`py-2 px-2 rounded border text-xs transition-all text-center ${
-                      selectedBeast === c
+                    className={`py-2 px-2 rounded border text-xs transition-all text-center ${selectedBeast === c
                         ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
                         : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                      }`}
                   >
                     {c}
                   </button>
@@ -367,11 +381,10 @@ export default function SummonPage() {
                     <div
                       key={idx}
                       onClick={() => handleSelectPlate(idx)}
-                      className={`relative aspect-video rounded overflow-hidden cursor-pointer border-2 transition-all ${
-                        isSelected
+                      className={`relative aspect-video rounded overflow-hidden cursor-pointer border-2 transition-all ${isSelected
                           ? "border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.35)] opacity-100 scale-[1.02]"
                           : "border-zinc-800 opacity-60 hover:opacity-100"
-                      }`}
+                        }`}
                     >
                       <Image
                         src={img}
@@ -382,9 +395,8 @@ export default function SummonPage() {
                         className="object-cover"
                       />
                       <div className="absolute bottom-1.5 left-2 flex items-center gap-1">
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold ${
-                          isSelected ? "bg-amber-400 text-obsidian-950" : "bg-[#080808]/90 text-zinc-300"
-                        }`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold ${isSelected ? "bg-amber-400 text-obsidian-950" : "bg-[#080808]/90 text-zinc-300"
+                          }`}>
                           PLATE {idx + 1}
                         </span>
                       </div>
@@ -395,9 +407,8 @@ export default function SummonPage() {
 
               {/* Custom Upload */}
               <div>
-                <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded p-3 cursor-pointer bg-[#080808] transition-colors ${
-                  customArtworkUrl ? "border-amber-400/80 bg-[#121215]" : "border-zinc-800 hover:border-zinc-700"
-                }`}>
+                <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded p-3 cursor-pointer bg-[#080808] transition-colors ${customArtworkUrl ? "border-amber-400/80 bg-[#121215]" : "border-zinc-800 hover:border-zinc-700"
+                  }`}>
                   <Upload className="h-3.5 w-3.5 text-zinc-400" />
                   <span className="text-xs text-zinc-300 font-mono">
                     {customArtworkUrl ? "Replace Custom Artwork" : "Upload Custom Artwork (PNG, SVG, JPG)"}

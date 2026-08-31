@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { pinata } from "@/lib/pinata";
+import { BEAST_IPFS_CIDS } from "@/lib/ipfs-cids";
+
+const BEAST_NAMES = Object.keys(BEAST_IPFS_CIDS) as [string, ...string[]];
 
 const UploadSchema = z.object({
   name: z.string().min(1, "Name is required").max(60, "Name too long"),
@@ -9,32 +13,29 @@ const UploadSchema = z.object({
   attack: z.coerce.number().min(1).max(100),
   defense: z.coerce.number().min(1).max(100),
   speed: z.coerce.number().min(1).max(100),
-  customImageUrl: z.string().optional(),
+  // Present only when the user picked a built-in preset instead of uploading
+  // a custom image. Must be one of BEAST_IPFS_CIDS's keys — never an
+  // arbitrary client-supplied URL.
+  builtinBeast: z.enum(BEAST_NAMES).optional(),
 });
+
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const element = formData.get("element") as string;
-    const rarity = formData.get("rarity") as string;
-    const attack = formData.get("attack") as string;
-    const defense = formData.get("defense") as string;
-    const speed = formData.get("speed") as string;
-    const customImageUrl = (formData.get("customImageUrl") as string) || "";
 
-    // Server-side Zod validation
     const parsed = UploadSchema.safeParse({
-      name,
-      description,
-      element,
-      rarity,
-      attack,
-      defense,
-      speed,
-      customImageUrl,
+      name: formData.get("name"),
+      description: formData.get("description"),
+      element: formData.get("element"),
+      rarity: formData.get("rarity"),
+      attack: formData.get("attack"),
+      defense: formData.get("defense"),
+      speed: formData.get("speed"),
+      builtinBeast: formData.get("builtinBeast") || undefined,
     });
 
     if (!parsed.success) {
@@ -44,60 +45,49 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate file if provided
-    let imageUri = customImageUrl;
-    const pinataJwt = process.env.PINATA_JWT;
+    const hasCustomFile = !!file && file.size > 0;
+    const hasBuiltinBeast = !!parsed.data.builtinBeast;
 
-    if (file && file.size > 0) {
-      // Check MIME type
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
-      if (!allowedTypes.includes(file.type)) {
+    if (!hasCustomFile && !hasBuiltinBeast) {
+      return NextResponse.json(
+        { error: "Provide either an image file or a valid builtinBeast." },
+        { status: 400 }
+      );
+    }
+
+    let imageUri: string;
+
+    if (hasCustomFile) {
+      if (!ALLOWED_MIME_TYPES.includes(file!.type)) {
         return NextResponse.json(
           { error: "Invalid file type. Only JPEG, PNG, WEBP, GIF, and SVG images are allowed." },
           { status: 400 }
         );
       }
-
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
+      if (file!.size > MAX_FILE_SIZE_BYTES) {
         return NextResponse.json(
           { error: "File size exceeds maximum limit of 10MB." },
           { status: 400 }
         );
       }
 
-      // If Pinata JWT is configured, pin image to Pinata IPFS
-      if (pinataJwt) {
-        const imageFormData = new FormData();
-        imageFormData.append("file", file);
-        const pinataRes = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${pinataJwt}`,
-          },
-          body: imageFormData,
-        });
-
-        if (pinataRes.ok) {
-          const pinData = await pinataRes.json();
-          imageUri = `ipfs://${pinData.IpfsHash}`;
-        }
+      try {
+        const upload = await pinata.upload.public.file(file!);
+        imageUri = `ipfs://${upload.cid}`;
+      } catch (err) {
+        console.error("Pinata image upload failed:", err);
+        return NextResponse.json(
+          { error: "Failed to upload image to IPFS." },
+          { status: 502 }
+        );
       }
-
-      // Fallback if no Pinata or upload failed
-      if (!imageUri || imageUri === customImageUrl) {
-        const buffer = await file.arrayBuffer();
-        const base64 = Buffer.from(buffer).toString("base64");
-        imageUri = `data:${file.type};base64,${base64}`;
-      }
+    } else {
+      // Built-in artwork — already pinned by scripts/pin-builtin-artworks.mjs.
+      // No network call needed, no arbitrary URL accepted.
+      const cid = BEAST_IPFS_CIDS[parsed.data.builtinBeast!];
+      imageUri = `ipfs://${cid}`;
     }
 
-    if (!imageUri) {
-      // Default fallback image based on element
-      imageUri = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=800&q=80";
-    }
-
-    // Construct standard ERC-721 Metadata JSON
     const metadata = {
       name: parsed.data.name,
       description: parsed.data.description,
@@ -112,50 +102,29 @@ export async function POST(req: Request) {
       ],
     };
 
-    let metadataCid = "";
-    let tokenUri = "";
-
-    // Pin metadata JSON to Pinata IPFS if configured
-    if (pinataJwt) {
-      const pinJsonRes = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${pinataJwt}`,
-        },
-        body: JSON.stringify({
-          pinataContent: metadata,
-          pinataMetadata: {
-            name: `${parsed.data.name.replace(/\s+/g, "_")}_metadata.json`,
-          },
-        }),
-      });
-
-      if (pinJsonRes.ok) {
-        const jsonPinData = await pinJsonRes.json();
-        metadataCid = jsonPinData.IpfsHash;
-        tokenUri = `ipfs://${metadataCid}`;
-      }
-    }
-
-    // If no Pinata JWT, create self-describing verifiable base64 data URI or simulated IPFS hash
-    if (!tokenUri) {
-      const metadataBase64 = Buffer.from(JSON.stringify(metadata)).toString("base64");
-      tokenUri = `data:application/json;base64,${metadataBase64}`;
-      metadataCid = "bafybeicid" + Math.random().toString(36).substring(2, 15);
+    let metadataCid: string;
+    try {
+      const metadataUpload = await pinata.upload.public.json(metadata);
+      metadataCid = metadataUpload.cid;
+    } catch (err) {
+      console.error("Pinata metadata upload failed:", err);
+      return NextResponse.json(
+        { error: "Failed to upload NFT metadata to IPFS." },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({
       success: true,
       metadataCid,
-      tokenUri,
+      tokenUri: `ipfs://${metadataCid}`,
       imageUri,
       metadata,
     });
   } catch (err: any) {
     console.error("Upload route error:", err);
     return NextResponse.json(
-      { error: "Internal server error during upload", message: err.message },
+      { error: "Internal server error during upload." },
       { status: 500 }
     );
   }
