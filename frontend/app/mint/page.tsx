@@ -1,15 +1,36 @@
 "use client";
-
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { Upload, Loader2, ArrowRight } from "lucide-react";
 import { ELEMENTS, RARITIES, CREATURE_NAMES, BEAST_ARTWORK_MAP, BeastElement, BeastRarity } from "@/lib/elements";
 import { getContractAddresses, NFT_ABI, decodeContractError } from "@/lib/contracts";
 import { TransactionModal, TxStep } from "@/components/TransactionModal";
 import { PhysicalBeastCard } from "@/components/cards/PhysicalBeastCard";
 import { trpc } from "@/lib/trpc";
+import { keccak256, toBytes } from "viem";
+
+const CARD_MINTED_EVENT_TOPIC = keccak256(
+  toBytes("CardMinted(uint256,address,string)")
+);
+
+type MintContext = {
+  owner: `0x${string}`;
+  tokenUri: string;
+  imageUri: string;
+  name: string;
+  description: string;
+  element: BeastElement;
+  rarity: BeastRarity;
+  attack: number;
+  defense: number;
+  speed: number;
+};
 
 export default function SummonPage() {
   const router = useRouter();
@@ -38,12 +59,14 @@ export default function SummonPage() {
   const [isUploadingToIpfs, setIsUploadingToIpfs] = useState(false);
   const [txStep, setTxStep] = useState<TxStep>("idle");
   const [mintedTokenId, setMintedTokenId] = useState<string | null>(null);
+  const [mintContext, setMintContext] = useState<MintContext | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const syncBeastMutation = trpc.beasts.syncBeast.useMutation();
 
   const { writeContract, data: txHash, isPending: isPrompting, error: writeError, reset: resetWrite } = useWriteContract();
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { data: receipt, isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
@@ -76,12 +99,62 @@ export default function SummonPage() {
       setTxStep("wallet_confirmation");
     } else if (isConfirming) {
       setTxStep("pending");
-    } else if (isSuccess) {
-      setTxStep("confirmed");
     } else if (writeError) {
       setTxStep("failed");
     }
-  }, [isPrompting, isConfirming, isSuccess, writeError]);
+  }, [isPrompting, isConfirming, writeError]);
+
+  const syncConfirmedMint = async () => {
+    if (!receipt || !mintContext || !txHash || !addresses?.nft) return;
+
+    setSyncError(null);
+    setTxStep("syncing");
+
+    const mintLog = receipt.logs.find(
+      (log) =>
+        log.address.toLowerCase() === addresses.nft.toLowerCase() &&
+        log.topics[0]?.toLowerCase() === CARD_MINTED_EVENT_TOPIC.toLowerCase()
+    );
+    const tokenIdTopic = mintLog?.topics[1];
+
+    if (!tokenIdTopic) {
+      setSyncError("The mint was confirmed, but its CardMinted event could not be found.");
+      setTxStep("sync_failed");
+      return;
+    }
+
+    try {
+      const tokenId = BigInt(tokenIdTopic).toString();
+      await syncBeastMutation.mutateAsync({
+        tokenId,
+        owner: mintContext.owner,
+        tokenUri: mintContext.tokenUri,
+        name: mintContext.name,
+        description: mintContext.description,
+        image: mintContext.imageUri,
+        element: mintContext.element,
+        rarity: mintContext.rarity,
+        attack: mintContext.attack,
+        defense: mintContext.defense,
+        speed: mintContext.speed,
+        txHash,
+      });
+      setMintedTokenId(tokenId);
+      setTxStep("confirmed");
+    } catch (error) {
+      console.error("Failed to synchronize confirmed mint:", error);
+      setSyncError("Your NFT was minted, but we could not save it to the collection. Please retry the sync.");
+      setTxStep("sync_failed");
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess && receipt && mintContext) {
+      void syncConfirmedMint();
+    }
+  // syncConfirmedMint is intentionally invoked only when Wagmi supplies a new receipt.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, receipt]);
 
   const elementInfo = ELEMENTS[selectedElement] || ELEMENTS.Fire;
 
@@ -95,14 +168,15 @@ export default function SummonPage() {
   // Handle Beast selection
   const handleSelectBeast = (beastName: string) => {
     setSelectedBeast(beastName);
-    if (customArtworkUrl && customArtworkUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(customArtworkUrl);
+
+    // Don't change artwork/plate state while custom artwork is active.
+    if (customArtworkUrl) {
+      return;
     }
-    setCustomArtworkUrl(null);
-    setCustomFile(null);
     const beastArtwork = BEAST_ARTWORK_MAP[beastName];
     if (beastArtwork) {
       const plateIdx = elementInfo.sampleImages.indexOf(beastArtwork);
+
       if (plateIdx >= 0) {
         setSelectedPlateIndex(plateIdx);
       }
@@ -112,15 +186,13 @@ export default function SummonPage() {
   // Handle Element selection
   const handleSelectElement = (elem: BeastElement) => {
     setSelectedElement(elem);
-    if (customArtworkUrl && customArtworkUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(customArtworkUrl);
-    }
-    setCustomArtworkUrl(null);
-    setCustomFile(null);
-    setSelectedPlateIndex(0);
     const targetElementInfo = ELEMENTS[elem];
     if (targetElementInfo?.defaultCreature) {
       setSelectedBeast(targetElementInfo.defaultCreature);
+    }
+    // Don't change the selected plate while custom artwork is active.
+    if (!customArtworkUrl) {
+      setSelectedPlateIndex(0);
     }
   };
 
@@ -147,7 +219,6 @@ export default function SummonPage() {
   };
 
   // Submit flow: Client validation -> /api/upload -> mint()
-  // Submit flow: Client validation -> /api/upload -> mint()
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -156,28 +227,43 @@ export default function SummonPage() {
       return;
     }
 
+    if (!addresses?.nft) {
+      alert("NFT contract address is not configured for this network.");
+      return;
+    }
+
     try {
+      // --------------------------------------------------
+      // STEP 1: Upload image + metadata to IPFS
+      // --------------------------------------------------
+
       setIsUploadingToIpfs(true);
 
       const formData = new FormData();
+
       if (customFile) {
+        // Custom artwork
         formData.append("file", customFile);
       } else {
-        // activeArtworkUrl is a local /beasts/*.svg path — resolve it back to
-        // the canonical creature key that BEAST_IPFS_CIDS (and route.ts) expects.
-        const builtinBeastId = Object.entries(BEAST_ARTWORK_MAP).find(
+        // Built-in artwork
+        //
+        // IMPORTANT:
+        // The upload route validates this against the built-in artwork manifest.
+        const builtinArtworkId = Object.entries(BEAST_ARTWORK_MAP).find(
           ([, path]) => path === activeArtworkUrl
         )?.[0];
 
-        if (!builtinBeastId) {
-          alert(
-            "Couldn't match the selected artwork to a pinned built-in beast. Try selecting a different plate, or upload a custom image."
-          );
+        if (!builtinArtworkId) {
           setIsUploadingToIpfs(false);
+
+          alert(
+            "Couldn't identify the selected built-in artwork. Please select another plate or upload a custom image."
+          );
+
           return;
         }
 
-        formData.append("builtinBeast", builtinBeastId);
+        formData.append("builtinArtworkId", builtinArtworkId);
       }
 
       formData.append("name", selectedBeast);
@@ -188,55 +274,70 @@ export default function SummonPage() {
       formData.append("defense", String(defense));
       formData.append("speed", String(speed));
 
-      // ...rest unchanged
-
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
       const uploadResult = await res.json();
+
       setIsUploadingToIpfs(false);
 
       if (!res.ok || !uploadResult.success) {
-        alert(uploadResult.error || "Failed to upload metadata to IPFS.");
+        alert(
+          uploadResult.error ||
+          "Failed to upload artwork and metadata to IPFS."
+        );
+
         return;
       }
 
-      const tokenUri = uploadResult.tokenUri;
-      const nextId = String(Date.now()).slice(-4);
-      setMintedTokenId(nextId);
+      const tokenUri: string = uploadResult.tokenUri;
 
-      // Execute on-chain mint
+      if (!tokenUri || !tokenUri.startsWith("ipfs://")) {
+        alert("Invalid IPFS metadata URI returned by the server.");
+        return;
+      }
+
+      console.log("IPFS upload successful:");
+      console.log("Metadata CID:", uploadResult.metadataCid);
+      console.log("Token URI:", tokenUri);
+      console.log("Image URI:", uploadResult.imageUri);
+
+      // --------------------------------------------------
+      // STEP 2: Mint NFT on-chain
+      // --------------------------------------------------
+
+      setMintContext({
+        owner: address,
+        tokenUri,
+        imageUri: uploadResult.imageUri,
+        name: selectedBeast,
+        description,
+        element: selectedElement,
+        rarity: selectedRarity,
+        attack,
+        defense,
+        speed,
+      });
+
       writeContract(
         {
           address: addresses.nft,
           abi: NFT_ABI,
           functionName: "mint",
           args: [address, tokenUri],
-        },
-        {
-          onSuccess: (hash) => {
-            syncBeastMutation.mutate({
-              tokenId: nextId,
-              owner: address,
-              tokenUri,
-              name: selectedBeast,
-              description,
-              image: uploadResult.imageUri,
-              element: selectedElement,
-              rarity: selectedRarity,
-              attack,
-              defense,
-              speed,
-              txHash: hash,
-            });
-          },
         }
       );
     } catch (err: any) {
+      console.error("Mint preparation error:", err);
+
       setIsUploadingToIpfs(false);
-      alert(`Error preparing mint: ${err.message}`);
+
+      alert(
+        `Error preparing mint: ${err?.message || "Unknown error"
+        }`
+      );
     }
   };
 
@@ -301,8 +402,8 @@ export default function SummonPage() {
                     type="button"
                     onClick={() => handleSelectElement(elem.name)}
                     className={`py-2.5 px-2 rounded border text-center transition-all ${selectedElement === elem.name
-                        ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
-                        : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                      ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
+                      : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
                       }`}
                   >
                     <span className="text-xs block font-bold" style={{ color: elem.color }}>
@@ -331,8 +432,8 @@ export default function SummonPage() {
                     type="button"
                     onClick={() => setSelectedRarity(r)}
                     className={`py-2 px-3 rounded border text-xs transition-all text-center ${selectedRarity === r
-                        ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
-                        : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                      ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
+                      : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
                       }`}
                   >
                     {r.toUpperCase()}
@@ -354,8 +455,8 @@ export default function SummonPage() {
                     type="button"
                     onClick={() => handleSelectBeast(c)}
                     className={`py-2 px-2 rounded border text-xs transition-all text-center ${selectedBeast === c
-                        ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
-                        : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                      ? "bg-[#18181b] border-zinc-400 text-ivory-50 font-bold shadow-inner"
+                      : "bg-[#080808] border-zinc-800 text-zinc-400 hover:border-zinc-700"
                       }`}
                   >
                     {c}
@@ -382,8 +483,8 @@ export default function SummonPage() {
                       key={idx}
                       onClick={() => handleSelectPlate(idx)}
                       className={`relative aspect-video rounded overflow-hidden cursor-pointer border-2 transition-all ${isSelected
-                          ? "border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.35)] opacity-100 scale-[1.02]"
-                          : "border-zinc-800 opacity-60 hover:opacity-100"
+                        ? "border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.35)] opacity-100 scale-[1.02]"
+                        : "border-zinc-800 opacity-60 hover:opacity-100"
                         }`}
                     >
                       <Image
@@ -514,13 +615,18 @@ export default function SummonPage() {
         onClose={() => {
           setTxStep("idle");
           resetWrite();
-          router.push("/my-collection");
+          setMintContext(null);
+          setSyncError(null);
+          if (txStep === "confirmed") {
+            router.push("/my-collection");
+          }
         }}
         step={txStep}
         title="Summoning Elemental Beast"
         txHash={txHash}
-        errorMessage={writeError ? decodeContractError(writeError) : undefined}
-        successMessage={`Your ${selectedBeast} has been summoned and minted to your wallet on Base Sepolia.`}
+        errorMessage={syncError || (writeError ? decodeContractError(writeError) : undefined)}
+        successMessage={`Your ${selectedBeast} has been minted and added to your collection${mintedTokenId ? ` as #${mintedTokenId}` : ""}.`}
+        onRetry={txStep === "sync_failed" ? () => void syncConfirmedMint() : undefined}
       />
     </div>
   );

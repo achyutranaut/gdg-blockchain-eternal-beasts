@@ -4,7 +4,7 @@ import React from "react";
 import { CheckCircle2, XCircle, Loader2, ExternalLink, ShieldAlert, Sparkles } from "lucide-react";
 import { shortenAddress } from "../lib/utils";
 
-export type TxStep = "idle" | "wallet_confirmation" | "pending" | "confirmed" | "failed";
+export type TxStep = "idle" | "wallet_confirmation" | "pending" | "syncing" | "confirmed" | "sync_failed" | "failed";
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -78,6 +78,21 @@ export function TransactionModal({
           </div>
         )}
 
+        {/* Step: Collection synchronization */}
+        {step === "syncing" && (
+          <div className="space-y-4 py-4">
+            <div className="h-16 w-16 mx-auto rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Finalizing your collection</h3>
+              <p className="text-sm text-zinc-400 mt-1">
+                Your mint is confirmed on-chain. Saving it to your collection...
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Step: Confirmed */}
         {step === "confirmed" && (
           <div className="space-y-4 py-4">
@@ -139,6 +154,30 @@ export function TransactionModal({
                 className="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-xl transition-colors"
               >
                 Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "sync_failed" && (
+          <div className="space-y-4 py-4">
+            <div className="h-16 w-16 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+              <ShieldAlert className="h-8 w-8 text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Mint confirmed, sync needs retry</h3>
+              <p className="text-xs text-amber-200 bg-amber-950/30 border border-amber-900/50 p-3 rounded-lg mt-2 text-left leading-relaxed">
+                {errorMessage || "Your NFT exists on-chain, but it could not be saved to this collection yet."}
+              </p>
+            </div>
+            <div className="flex gap-2 pt-2">
+              {onRetry && (
+                <button onClick={onRetry} className="flex-1 py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-semibold rounded-xl transition-colors">
+                  Retry sync
+                </button>
+              )}
+              <button onClick={onClose} className="flex-1 py-2.5 px-4 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold rounded-xl transition-colors">
+                Close
               </button>
             </div>
           </div>

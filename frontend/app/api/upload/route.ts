@@ -16,7 +16,7 @@ const UploadSchema = z.object({
   // Present only when the user picked a built-in preset instead of uploading
   // a custom image. Must be one of BEAST_IPFS_CIDS's keys — never an
   // arbitrary client-supplied URL.
-  builtinBeast: z.enum(BEAST_NAMES).optional(),
+  builtinArtworkId: z.enum(BEAST_NAMES).optional(),
 });
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       attack: formData.get("attack"),
       defense: formData.get("defense"),
       speed: formData.get("speed"),
-      builtinBeast: formData.get("builtinBeast") || undefined,
+      builtinArtworkId: formData.get("builtinArtworkId") || undefined,
     });
 
     if (!parsed.success) {
@@ -46,11 +46,11 @@ export async function POST(req: Request) {
     }
 
     const hasCustomFile = !!file && file.size > 0;
-    const hasBuiltinBeast = !!parsed.data.builtinBeast;
+    const hasBuiltinArtwork = !!parsed.data.builtinArtworkId;
 
-    if (!hasCustomFile && !hasBuiltinBeast) {
+    if (!hasCustomFile && !hasBuiltinArtwork) {
       return NextResponse.json(
-        { error: "Provide either an image file or a valid builtinBeast." },
+        { error: "Provide either an image file or a valid built-in artwork." },
         { status: 400 }
       );
     }
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     } else {
       // Built-in artwork — already pinned by scripts/pin-builtin-artworks.mjs.
       // No network call needed, no arbitrary URL accepted.
-      const cid = BEAST_IPFS_CIDS[parsed.data.builtinBeast!];
+      const cid = BEAST_IPFS_CIDS[parsed.data.builtinArtworkId!];
       imageUri = `ipfs://${cid}`;
     }
 
