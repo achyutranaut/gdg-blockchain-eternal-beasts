@@ -14,11 +14,9 @@ export default function HomePage() {
 
   return (
     <div className="space-y-20 pb-20 overflow-hidden">
-      {/* 1. Large Editorial Hero Section */}
       <section className="relative pt-12 pb-16 md:pt-16 md:pb-20 border-b border-zinc-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left: Headline + Description + CTAs */}
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#111113] border border-zinc-800 text-xs font-mono text-amber-400">
                 <span>BASE SEPOLIA • NON-CUSTODIAL COLLECTIBLES</span>
@@ -49,7 +47,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Protocol Metrics Strip */}
               <div className="grid grid-cols-4 gap-3 pt-6 border-t border-zinc-800/80 max-w-lg font-mono">
                 <div>
                   <span className="text-[9px] text-zinc-400 block tracking-wider uppercase">Minted</span>
@@ -70,7 +67,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: Full Featured Collectible Card */}
             <div className="lg:col-span-5 flex justify-center">
               <PhysicalBeastCard
                 name="WOLF"
@@ -88,7 +84,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. The Six Elemental Affinities */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="border-b border-zinc-800/80 pb-3 flex items-end justify-between">
           <div>
@@ -119,7 +114,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Featured Collectible Beasts */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex items-end justify-between border-b border-zinc-800/80 pb-3">
           <div>

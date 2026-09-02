@@ -16,7 +16,6 @@ export function Navbar() {
 
   const addresses = getContractAddresses(chainId);
 
-  // Read proceeds directly from on-chain marketplace contract
   const { data: proceedsWei, refetch: refetchProceeds } = useReadContract({
     address: addresses.marketplace,
     abi: MARKETPLACE_ABI,
@@ -41,7 +40,6 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-[#080808]/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex flex-col">
             <span className="font-serif tracking-tight text-ivory-50 font-bold text-sm sm:text-base group-hover:text-amber-400 transition-colors">
@@ -53,7 +51,6 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Compact Navigation Links */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((item) => {
             const active = pathname === item.href;
@@ -77,9 +74,7 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right Action Area */}
         <div className="flex items-center gap-3">
-          {/* Pull-payment proceeds claim pill */}
           {isConnected && hasProceeds && (
             <button
               onClick={() => setIsWithdrawOpen(true)}
@@ -89,7 +84,6 @@ export function Navbar() {
             </button>
           )}
 
-          {/* RainbowKit Wallet Connect */}
           <ConnectButton
             showBalance={false}
             accountStatus="address"
@@ -98,7 +92,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Withdraw Modal */}
       {isConnected && (
         <WithdrawModal
           isOpen={isWithdrawOpen}

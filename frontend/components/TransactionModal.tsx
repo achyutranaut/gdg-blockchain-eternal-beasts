@@ -34,10 +34,8 @@ export function TransactionModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-5 text-center relative overflow-hidden">
-        {/* Top ambient glow */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Step: Wallet Confirmation */}
         {step === "wallet_confirmation" && (
           <div className="space-y-4 py-4">
             <div className="h-16 w-16 mx-auto rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
@@ -52,7 +50,6 @@ export function TransactionModal({
           </div>
         )}
 
-        {/* Step: Pending */}
         {step === "pending" && (
           <div className="space-y-4 py-4">
             <div className="h-16 w-16 mx-auto rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
@@ -78,7 +75,6 @@ export function TransactionModal({
           </div>
         )}
 
-        {/* Step: Collection synchronization */}
         {step === "syncing" && (
           <div className="space-y-4 py-4">
             <div className="h-16 w-16 mx-auto rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
@@ -93,7 +89,6 @@ export function TransactionModal({
           </div>
         )}
 
-        {/* Step: Confirmed */}
         {step === "confirmed" && (
           <div className="space-y-4 py-4">
             <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
@@ -128,7 +123,6 @@ export function TransactionModal({
           </div>
         )}
 
-        {/* Step: Failed */}
         {step === "failed" && (
           <div className="space-y-4 py-4">
             <div className="h-16 w-16 mx-auto rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">

@@ -34,15 +34,12 @@ export function ElementEffects({ element, interactive = true }: ElementEffectsPr
 
     for (let i = 0; i < count; i++) {
       if (element === "Fire" || element === "Air") {
-        // Float upwards
         array[i * 3 + 1] += speeds[i];
         if (array[i * 3 + 1] > 2.2) array[i * 3 + 1] = -2.2;
       } else if (element === "Water") {
-        // Drift downwards
         array[i * 3 + 1] -= speeds[i];
         if (array[i * 3 + 1] < -2.2) array[i * 3 + 1] = 2.2;
       } else {
-        // Subtle orbital pulse
         array[i * 3] += Math.sin(Date.now() * 0.001 + i) * 0.001;
       }
     }

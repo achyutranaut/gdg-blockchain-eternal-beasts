@@ -41,10 +41,8 @@ export function PhysicalBeastCard({
   const [transformStyle, setTransformStyle] = useState("");
   const [glareStyle, setGlareStyle] = useState({ opacity: 0, x: 50, y: 50 });
 
-  // Sync image source instantly on prop changes without tearing DOM
   useEffect(() => {
     const isLocalPath = imgSrc.startsWith("/") || imgSrc.startsWith("data:") || imgSrc.startsWith("blob:");
-    // Local assets render instantly — skip shimmer; remote assets need loading state
     setIsLoaded(isLocalPath);
   }, [imgSrc]);
 
@@ -94,7 +92,6 @@ export function PhysicalBeastCard({
           : "border-zinc-700 shadow-xl"
       } ${className}`}
     >
-      {/* Glare foil overlay */}
       <div
         className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300 rounded-xl"
         style={{
@@ -103,10 +100,8 @@ export function PhysicalBeastCard({
         }}
       />
 
-      {/* Inner Metallic Bevel Rim */}
       <div className="absolute inset-1.5 rounded-lg border border-white/10 pointer-events-none z-20" />
 
-      {/* 1. Card Header */}
       <div className="bg-[#141418] border border-white/10 rounded-t px-3.5 py-2 flex items-center justify-between z-10">
         <div>
           <span className="text-[8px] font-mono tracking-widest text-zinc-400 block uppercase font-bold">
@@ -123,22 +118,18 @@ export function PhysicalBeastCard({
         </div>
       </div>
 
-      {/* 2. Main Beast Artwork Frame */}
       <div className="relative flex-1 my-2 bg-[#050507] border border-white/10 rounded overflow-hidden flex items-center justify-center min-h-[200px]">
-        {/* Ambient Radial Accent */}
         <div
           className="absolute inset-0 opacity-30 pointer-events-none"
           style={{ background: `radial-gradient(circle at 50% 50%, ${elementInfo.color}, transparent 70%)` }}
         />
 
-        {/* Subtle Luxury Loading Shimmer Placeholder (Never an empty black box) */}
         {!isLoaded && (
           <div className="absolute inset-0 bg-[#09090c] flex items-center justify-center animate-pulse">
             <span className="text-2xl opacity-20">{elementInfo.icon}</span>
           </div>
         )}
 
-        {/* Next.js Optimized Image with Priority Preloading */}
         {isLocalAsset && imgSrc.startsWith("/") ? (
           <Image
             src={imgSrc}
@@ -170,7 +161,6 @@ export function PhysicalBeastCard({
         )}
       </div>
 
-      {/* 3. Center Ribbon */}
       <div className="bg-[#141418] border border-white/10 py-1.5 px-3 rounded text-center z-10 mb-2">
         <span className="font-serif font-bold text-xs text-ivory-100 block tracking-wider">
           {name.toUpperCase()}
@@ -183,7 +173,6 @@ export function PhysicalBeastCard({
         </span>
       </div>
 
-      {/* 4. Combat Attribute Stats */}
       <div className="grid grid-cols-3 bg-[#08080a] border border-white/10 rounded py-2 px-1 text-center font-mono z-10 mb-2">
         <div>
           <span className="text-[8px] text-zinc-400 block tracking-wider font-bold">ATK</span>
@@ -199,7 +188,6 @@ export function PhysicalBeastCard({
         </div>
       </div>
 
-      {/* 5. Footer: Rarity & Network / Price */}
       <div className="bg-[#141418] border border-white/10 rounded-b px-3.5 py-2 flex items-center justify-between z-10">
         <span
           className="text-[10px] font-mono font-bold tracking-wider"

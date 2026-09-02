@@ -13,21 +13,26 @@ export default function ExplorePage() {
   const { address, isConnected, chainId } = useAccount();
   const addresses = getContractAddresses(chainId);
 
-  // Filters state
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedElement, setSelectedElement] = useState("All");
   const [selectedRarity, setSelectedRarity] = useState("All");
+  const [minAttack, setMinAttack] = useState<number>(0);
   const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc" | "rarity">("newest");
 
-  // Transaction state
   const [txStep, setTxStep] = useState<TxStep>("idle");
   const [buyingTokenId, setBuyingTokenId] = useState<string | null>(null);
 
-  // Query marketplace listings
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const { data: listings, isLoading, refetch } = trpc.listings.search.useQuery({
     element: selectedElement,
     rarity: selectedRarity,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
+    minAttack: minAttack > 0 ? minAttack : undefined,
     sortBy,
   });
 
@@ -79,7 +84,6 @@ export default function ExplorePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
       <div className="border-b border-zinc-800/80 pb-6">
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ivory-50 tracking-tight">
           EXPLORE BEASTS
@@ -89,10 +93,8 @@ export default function ExplorePage() {
         </p>
       </div>
 
-      {/* Filters Bar */}
       <div className="space-y-4 bg-obsidian-900 border border-zinc-800/80 rounded p-4 card-metallic-bevel">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Search Input */}
           <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
             <input
@@ -104,7 +106,6 @@ export default function ExplorePage() {
             />
           </div>
 
-          {/* Sort Dropdown */}
           <div>
             <select
               value={sortBy}
@@ -119,7 +120,6 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        {/* Element Filter Row */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 font-mono">
           <button
             onClick={() => setSelectedElement("All")}
@@ -146,7 +146,6 @@ export default function ExplorePage() {
           ))}
         </div>
 
-        {/* Rarity Filter Row */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 font-mono">
           <button
             onClick={() => setSelectedRarity("All")}
@@ -174,7 +173,6 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      {/* Cards Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -204,6 +202,7 @@ export default function ExplorePage() {
               setSearch("");
               setSelectedElement("All");
               setSelectedRarity("All");
+              setMinAttack(0);
             }}
             className="px-4 py-2 bg-obsidian-800 hover:bg-obsidian-700 text-ivory-200 border border-zinc-700 rounded text-xs font-mono"
           >
@@ -212,7 +211,6 @@ export default function ExplorePage() {
         </div>
       )}
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={txStep !== "idle"}
         onClose={() => {

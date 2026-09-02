@@ -24,7 +24,6 @@ export default function ActivityPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
       <div className="border-b border-zinc-800/80 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ivory-50 tracking-tight">
@@ -36,7 +35,6 @@ export default function ActivityPage() {
         </div>
       </div>
 
-      {/* Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-zinc-800 font-mono">
         {["ALL", "MINT", "LIST", "SALE", "TRANSFER", "CANCEL"].map((t) => {
           const labelMap: Record<string, string> = {
@@ -63,7 +61,6 @@ export default function ActivityPage() {
         })}
       </div>
 
-      {/* Activity Timeline List */}
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -78,12 +75,10 @@ export default function ActivityPage() {
               className="p-4 rounded bg-obsidian-900 border border-zinc-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-zinc-700 transition-colors card-metallic-bevel"
             >
               <div className="flex items-center gap-4">
-                {/* Event Type Badge */}
                 <div className="px-2 py-1 rounded bg-obsidian-950 border border-zinc-800 type-micro text-amber-400 shrink-0 font-mono text-[10px]">
                   {item.type === "MINT" ? "MINTED" : item.type === "LIST" ? "LISTED" : item.type === "SALE" ? "SOLD" : item.type === "TRANSFER" ? "TRANSFERRED" : "CANCELLED"}
                 </div>
 
-                {/* Beast Thumbnail */}
                 <div className="h-10 w-10 rounded bg-obsidian-950 overflow-hidden border border-zinc-800 shrink-0">
                   <ActivityArtwork
                     image={item.beast?.image}
@@ -91,7 +86,6 @@ export default function ActivityPage() {
                   />
                 </div>
 
-                {/* Details */}
                 <div>
                   <div className="flex items-center gap-2">
                     <Link
@@ -138,7 +132,6 @@ export default function ActivityPage() {
                 </div>
               </div>
 
-              {/* Timestamp & Tx Link */}
               <div className="flex items-center gap-3 text-xs font-mono text-zinc-400 self-end sm:self-center">
                 <span className="type-micro">{formatTimestamp(item.timestamp)}</span>
                 {item.txHash && (

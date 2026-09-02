@@ -17,7 +17,6 @@ export function CardLighting({ element, pointerPos }: CardLightingProps) {
 
   useFrame(() => {
     if (spotlightRef.current) {
-      // Dynamic key light following pointer with spring-damped motion
       spotlightRef.current.position.x = THREE.MathUtils.lerp(
         spotlightRef.current.position.x,
         pointerPos.current.x * 3.5,
@@ -33,10 +32,8 @@ export function CardLighting({ element, pointerPos }: CardLightingProps) {
 
   return (
     <>
-      {/* Ambient Fill */}
       <ambientLight intensity={0.65} color="#fafaf9" />
 
-      {/* Main Cursor-Driven Key Spotlight */}
       <spotLight
         ref={spotlightRef}
         position={[0, 0, 4.5]}
@@ -46,7 +43,6 @@ export function CardLighting({ element, pointerPos }: CardLightingProps) {
         color="#ffffff"
       />
 
-      {/* Element Accent Rim Light */}
       <pointLight
         ref={rimLightRef}
         position={[2.5, -2, -1.5]}
@@ -54,7 +50,6 @@ export function CardLighting({ element, pointerPos }: CardLightingProps) {
         color={elementTheme.color}
       />
 
-      {/* Back Subtle Fill */}
       <directionalLight position={[-3, 3, -2]} intensity={0.4} color="#e7e5e4" />
     </>
   );

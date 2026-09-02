@@ -37,7 +37,6 @@ export default function SummonPage() {
   const { address, isConnected, chainId } = useAccount();
   const addresses = getContractAddresses(chainId);
 
-  // 1. Central Summon Configuration State
   const [selectedElement, setSelectedElement] = useState<BeastElement>("Fire");
   const [selectedRarity, setSelectedRarity] = useState<BeastRarity>("Rare");
   const [selectedBeast, setSelectedBeast] = useState<string>("WOLF");
@@ -46,17 +45,14 @@ export default function SummonPage() {
   const [customArtworkUrl, setCustomArtworkUrl] = useState<string | null>(null);
   const [customFile, setCustomFile] = useState<File | null>(null);
 
-  // Lore / Description
   const [description, setDescription] = useState(
     "Forged in subterranean magma veins, commands unyielding infernal resolve."
   );
 
-  // Combat Stats
   const [attack, setAttack] = useState(84);
   const [defense, setDefense] = useState(68);
   const [speed, setSpeed] = useState(76);
 
-  // Upload & Transaction state
   const [isUploadingToIpfs, setIsUploadingToIpfs] = useState(false);
   const [txStep, setTxStep] = useState<TxStep>("idle");
   const [mintedTokenId, setMintedTokenId] = useState<string | null>(null);
@@ -71,7 +67,6 @@ export default function SummonPage() {
     hash: txHash,
   });
 
-  // Preload all beast vectors & plate artworks in the browser cache in the background
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -86,7 +81,6 @@ export default function SummonPage() {
     });
   }, []);
 
-  // Clean up any generated custom object URLs on unmount
   useEffect(() => {
     return () => {
       if (customArtworkUrl && customArtworkUrl.startsWith("blob:")) {
@@ -165,13 +159,11 @@ export default function SummonPage() {
     [elementInfo.sampleImages, selectedArtworkId]
   );
 
-  // Derive active artwork for the live preview card
   const activeArtworkUrl = useMemo(() => {
     if (customArtworkUrl) return customArtworkUrl;
     return BEAST_ARTWORK_MAP[selectedArtworkId] || "/placeholder-beast.svg";
   }, [customArtworkUrl, selectedArtworkId]);
 
-  // Handle Beast selection
   const handleSelectBeast = (beastName: string) => {
     setSelectedBeast(beastName);
 
@@ -182,7 +174,6 @@ export default function SummonPage() {
     if (BEAST_ARTWORK_MAP[beastName]) setSelectedArtworkId(beastName);
   };
 
-  // Handle Element selection
   const handleSelectElement = (elem: BeastElement) => {
     setSelectedElement(elem);
     const targetElementInfo = ELEMENTS[elem];
@@ -192,7 +183,6 @@ export default function SummonPage() {
     }
   };
 
-  // Handle Plate Selection
   const handleSelectPlate = (idx: number) => {
     const artworkId = Object.entries(BEAST_ARTWORK_MAP).find(
       ([, path]) => path === elementInfo.sampleImages[idx]
@@ -206,7 +196,6 @@ export default function SummonPage() {
     setCustomFile(null);
   };
 
-  // Handle Custom File Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -218,7 +207,6 @@ export default function SummonPage() {
     }
   };
 
-  // Submit flow: Client validation -> /api/upload -> mint()
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -233,16 +221,11 @@ export default function SummonPage() {
     }
 
     try {
-      // --------------------------------------------------
-      // STEP 1: Upload image + metadata to IPFS
-      // --------------------------------------------------
-
       setIsUploadingToIpfs(true);
 
       const formData = new FormData();
 
       if (customFile) {
-        // Custom artwork
         formData.append("file", customFile);
       } else {
         // The selected asset ID is posted directly and validated against the
@@ -298,10 +281,6 @@ export default function SummonPage() {
       console.log("Token URI:", tokenUri);
       console.log("Image URI:", uploadResult.imageUri);
 
-      // --------------------------------------------------
-      // STEP 2: Mint NFT on-chain
-      // --------------------------------------------------
-
       setMintContext({
         owner: address,
         tokenUri,
@@ -337,7 +316,6 @@ export default function SummonPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
       <div className="border-b border-zinc-800/80 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ivory-50 tracking-tight">
@@ -353,7 +331,6 @@ export default function SummonPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Live Reactive Preview Card with Priority Preload */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center lg:sticky lg:top-20 space-y-3">
           <div className="w-full text-center">
             <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
@@ -375,13 +352,11 @@ export default function SummonPage() {
           />
         </div>
 
-        {/* Right Column: 5-Stage Creation Sequence */}
         <div className="lg:col-span-7">
           <form
             onSubmit={handleMint}
             className="p-6 rounded bg-[#0d0d10] border border-zinc-800 space-y-7 card-metallic-bevel"
           >
-            {/* 01 ELEMENT */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">01 ELEMENT</span>
@@ -408,7 +383,6 @@ export default function SummonPage() {
               </div>
             </div>
 
-            {/* 02 RARITY */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">02 RARITY</span>
@@ -436,7 +410,6 @@ export default function SummonPage() {
               </div>
             </div>
 
-            {/* 03 BEAST */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">03 BEAST</span>
@@ -459,7 +432,6 @@ export default function SummonPage() {
               </div>
             </div>
 
-            {/* 04 ARTWORK / PLATE */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">04 ARTWORK & PLATE</span>
@@ -472,7 +444,6 @@ export default function SummonPage() {
                 </span>
               </div>
 
-              {/* Sample Art Plate Selector */}
               <div className="grid grid-cols-2 gap-3">
                 {elementInfo.sampleImages.map((img, idx) => {
                   const isSelected = selectedPlateIndex === idx && !customArtworkUrl;
@@ -504,7 +475,6 @@ export default function SummonPage() {
                 })}
               </div>
 
-              {/* Custom Upload */}
               <div>
                 <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded p-3 cursor-pointer bg-[#080808] transition-colors ${customArtworkUrl ? "border-amber-400/80 bg-[#121215]" : "border-zinc-800 hover:border-zinc-700"
                   }`}>
@@ -517,7 +487,6 @@ export default function SummonPage() {
               </div>
             </div>
 
-            {/* 05 STATS */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <span className="text-xs font-bold text-ivory-100 font-mono tracking-wider">05 STATS</span>
@@ -525,7 +494,6 @@ export default function SummonPage() {
               </div>
 
               <div className="space-y-3 bg-[#080808] p-4 rounded border border-zinc-800">
-                {/* Attack */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-mono">
                     <span className="text-red-400 font-bold">Attack (ATK)</span>
@@ -541,7 +509,6 @@ export default function SummonPage() {
                   />
                 </div>
 
-                {/* Defense */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-mono">
                     <span className="text-blue-400 font-bold">Defense (DEF)</span>
@@ -557,7 +524,6 @@ export default function SummonPage() {
                   />
                 </div>
 
-                {/* Speed */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-mono">
                     <span className="text-yellow-400 font-bold">Speed (SPD)</span>
@@ -575,7 +541,6 @@ export default function SummonPage() {
               </div>
             </div>
 
-            {/* Final Action Button */}
             <button
               type="submit"
               disabled={isUploadingToIpfs || isPrompting || isConfirming}
@@ -607,7 +572,6 @@ export default function SummonPage() {
         </div>
       </div>
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={txStep !== "idle"}
         onClose={() => {

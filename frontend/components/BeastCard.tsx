@@ -30,7 +30,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
 
   const isListed = listing && listing.active;
 
-  // Lightweight tactile 3D tilt interaction for grid cards
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -72,7 +71,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
           : "border-zinc-700"
       )}
     >
-      {/* Glare foil overlay */}
       <div
         className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-300 rounded"
         style={{
@@ -81,7 +79,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         }}
       />
 
-      {/* 1. Header Bar: Brand + Creature + #Token */}
       <div className="px-2.5 py-1.5 bg-[#141418] border border-white/10 rounded-t flex items-center justify-between z-10">
         <div>
           <span className="text-[8px] font-mono tracking-widest text-zinc-400 block uppercase">
@@ -98,7 +95,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         </div>
       </div>
 
-      {/* 2. Real Beast Artwork Window */}
       <Link
         href={`/card/${beast.tokenId}`}
         className="relative aspect-square w-full bg-[#060608] my-1.5 rounded overflow-hidden block border border-white/10"
@@ -115,7 +111,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         />
       </Link>
 
-      {/* 3. Center Ribbon: Creature & Element */}
       <div className="py-1 px-2 bg-[#141418] border border-white/10 rounded text-center z-10 mb-1.5">
         <span className="font-serif font-bold text-xs text-ivory-100 block tracking-wider">
           {beast.name.toUpperCase()}
@@ -125,7 +120,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         </span>
       </div>
 
-      {/* 4. Stats: ATK / DEF / SPD */}
       <div className="grid grid-cols-3 bg-[#0a0a0c] border border-white/10 rounded text-center py-1.5 px-1 z-10 mb-1.5 font-mono">
         <div>
           <span className="text-[8px] text-zinc-400 block tracking-wider">ATK</span>
@@ -141,7 +135,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         </div>
       </div>
 
-      {/* 5. Rarity Strip */}
       <div className="px-2.5 py-1 bg-[#141418] border border-white/10 rounded flex items-center justify-between z-10 mb-1.5">
         <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: rarityInfo.color }}>
           {rarityInfo.label}
@@ -151,7 +144,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
         </span>
       </div>
 
-      {/* 6. Footer Settlement / Actions */}
       <div className="p-2 bg-[#0d0d10] border border-white/10 rounded-b flex items-center justify-between z-10">
         <div>
           {isListed ? (
@@ -171,7 +163,6 @@ export function BeastCard({ beast, listing, isOwner, onBuy, onList }: BeastCardP
           )}
         </div>
 
-        {/* Action Button */}
         {isListed && !isOwner && onBuy && (
           <button
             onClick={() => onBuy(beast.tokenId, listing.price)}

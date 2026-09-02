@@ -10,7 +10,6 @@ export function formatEther(wei: bigint | string | number | undefined): string {
   if (!wei) return "0";
   try {
     const formatted = viemFormatEther(BigInt(wei));
-    // Trim excess decimal zeroes if long
     const num = parseFloat(formatted);
     if (num < 0.0001 && num > 0) return "<0.0001";
     return num.toLocaleString(undefined, { maximumFractionDigits: 4 });

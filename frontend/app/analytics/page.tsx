@@ -26,7 +26,6 @@ export default function AnalyticsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
       <div className="border-b border-zinc-800/80 pb-6">
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ivory-50 tracking-tight">
           ANALYTICS
@@ -36,7 +35,6 @@ export default function AnalyticsPage() {
         </p>
       </div>
 
-      {/* 4 Core Metrics: TOTAL BEASTS / ACTIVE LISTINGS / TOTAL SALES / FLOOR PRICE */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-5 rounded bg-obsidian-900 border border-zinc-800/80 space-y-1 card-metallic-bevel">
           <span className="type-micro text-zinc-400 block font-mono">TOTAL BEASTS</span>
@@ -67,7 +65,6 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Single Clean Trading Volume Chart */}
       <div className="p-6 rounded bg-obsidian-900 border border-zinc-800 space-y-4 card-metallic-bevel">
         <div className="flex justify-between items-center border-b border-zinc-800 pb-3 font-mono">
           <span className="type-micro text-ivory-200">VOLUME HISTORY (ETH)</span>

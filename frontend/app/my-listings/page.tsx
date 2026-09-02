@@ -165,7 +165,6 @@ export default function MyListingsPage() {
         </div>
       )}
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={txStep !== "idle"}
         onClose={() => {

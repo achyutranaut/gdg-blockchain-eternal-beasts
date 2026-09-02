@@ -5,14 +5,12 @@ export const NFT_ABI = ElementalBeastNFTAbi;
 export const MARKETPLACE_ABI = MarketplaceAbi;
 
 export const CONTRACT_ADDRESSES = {
-  // Base Sepolia deployed addresses
   baseSepolia: {
     nft: (process.env.NEXT_PUBLIC_NFT_ADDRESS || "0x9cCa84aCE2d3CF4045dB0aAd03c908c7f083cc01") as `0x${string}`,
     marketplace: (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0xCB509975dCa8C8accCD558DcD08dA9dE6788cCb0") as `0x${string}`,
     chainId: 84532,
     explorer: "https://sepolia.basescan.org",
   },
-  // Anvil local addresses
   anvil: {
     nft: (process.env.NEXT_PUBLIC_ANVIL_NFT_ADDRESS || "0x5FbDB2315678afecb367f032d93F642f64180aa3") as `0x${string}`,
     marketplace: (process.env.NEXT_PUBLIC_ANVIL_MARKETPLACE_ADDRESS || "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512") as `0x${string}`,
@@ -79,7 +77,6 @@ export function decodeContractError(error: any): string {
     return "Token URI cannot be empty.";
   }
 
-  // Fallback to short message or truncated message
   if (error?.shortMessage) return error.shortMessage;
   return message.slice(0, 140);
 }

@@ -18,13 +18,11 @@ export default function MyCollectionPage() {
 
   const [filter, setFilter] = useState<"all" | "collection" | "listed">("all");
 
-  // Listing modal state
   const [selectedBeastToList, setSelectedBeastToList] = useState<BeastRecord | null>(null);
   const [listPrice, setListPrice] = useState("0.005");
   const [txStep, setTxStep] = useState<TxStep>("idle");
   const [txAction, setTxAction] = useState<"approve" | "list">("list");
 
-  // Fetch portfolio
   const { data: portfolio, isLoading, refetch } = trpc.wallets.portfolio.useQuery(
     { address: address || "" },
     { enabled: Boolean(address) }
@@ -37,7 +35,6 @@ export default function MyCollectionPage() {
     },
   });
 
-  // Pull payments proceeds
   const { data: proceedsWei, refetch: refetchProceeds } = useReadContract({
     address: addresses.marketplace,
     abi: MARKETPLACE_ABI,
@@ -48,7 +45,6 @@ export default function MyCollectionPage() {
     },
   });
 
-  // Approval check for selected beast
   const { data: isApprovedForAll } = useReadContract({
     address: addresses.nft,
     abi: NFT_ABI,
@@ -73,7 +69,6 @@ export default function MyCollectionPage() {
     Boolean(isApprovedForAll) ||
     (approvedAddress && (approvedAddress as string).toLowerCase() === addresses.marketplace.toLowerCase());
 
-  // Wagmi Write
   const { writeContract, data: txHash, isPending: isPrompting, error: writeError, reset: resetWrite } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -156,7 +151,6 @@ export default function MyCollectionPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-zinc-800/80 pb-6">
         <div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ivory-50 tracking-tight">
@@ -175,7 +169,6 @@ export default function MyCollectionPage() {
         </Link>
       </div>
 
-      {/* Pull Payments Proceeds Box (if any) */}
       {hasProceeds && (
         <div className="p-4 rounded bg-emerald-950/40 border border-emerald-600/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-3">
@@ -204,7 +197,6 @@ export default function MyCollectionPage() {
         </div>
       )}
 
-      {/* Filter Tabs: ALL / IN COLLECTION / LISTED */}
       <div className="flex items-center gap-1.5 border-b border-zinc-800 pb-3 font-mono">
         <button
           onClick={() => setFilter("all")}
@@ -232,7 +224,6 @@ export default function MyCollectionPage() {
         </button>
       </div>
 
-      {/* Cards Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
@@ -268,7 +259,6 @@ export default function MyCollectionPage() {
         </div>
       )}
 
-      {/* Quick List Modal */}
       {selectedBeastToList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-md bg-obsidian-900 border border-zinc-800 rounded p-6 shadow-2xl space-y-5 relative card-metallic-bevel">
@@ -321,7 +311,6 @@ export default function MyCollectionPage() {
         </div>
       )}
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={txStep !== "idle"}
         onClose={() => {

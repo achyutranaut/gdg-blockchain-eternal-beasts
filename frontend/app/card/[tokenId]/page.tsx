@@ -29,12 +29,10 @@ export default function BeastDetailPage() {
   const { address, isConnected, chainId } = useAccount();
   const addresses = getContractAddresses(chainId);
 
-  // Form states
   const [listPrice, setListPrice] = useState("0.005");
   const [txStep, setTxStep] = useState<TxStep>("idle");
   const [txAction, setTxAction] = useState<"buy" | "approve" | "list" | "cancel">("buy");
 
-  // Fetch beast details and activity
   const { data, isLoading, refetch } = trpc.beasts.byId.useQuery({ tokenId });
   const syncListingMutation = trpc.listings.syncListing.useMutation({
     onSuccess: () => refetch(),
@@ -43,7 +41,6 @@ export default function BeastDetailPage() {
     onSuccess: () => refetch(),
   });
 
-  // On-chain owner check
   const { data: onChainOwner } = useReadContract({
     address: addresses.nft,
     abi: NFT_ABI,
@@ -54,7 +51,6 @@ export default function BeastDetailPage() {
     },
   });
 
-  // Check if marketplace is approved
   const { data: isApprovedForAll } = useReadContract({
     address: addresses.nft,
     abi: NFT_ABI,
@@ -79,7 +75,6 @@ export default function BeastDetailPage() {
     Boolean(isApprovedForAll) ||
     (approvedAddress && (approvedAddress as string).toLowerCase() === addresses.marketplace.toLowerCase());
 
-  // Wagmi Write Contract
   const { writeContract, data: txHash, isPending: isPrompting, error: writeError, reset: resetWrite } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -207,7 +202,6 @@ export default function BeastDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Back link */}
       <Link
         href="/explore"
         className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-ivory-100 transition-colors"
@@ -217,7 +211,6 @@ export default function BeastDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left Col: Full Beast Card Preview */}
         <div className="lg:col-span-5 flex justify-center lg:sticky lg:top-20">
           <PhysicalBeastCard
             name={beast.name}
@@ -232,9 +225,7 @@ export default function BeastDetailPage() {
           />
         </div>
 
-        {/* Right Col: Primary Beast Identity, Combat Stats, Settlement, Provenance */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Beast Header */}
           <div className="space-y-3 border-b border-zinc-800/80 pb-6">
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono font-bold px-2 py-0.5 rounded border" style={{ color: elementInfo.color, borderColor: `${elementInfo.color}40` }}>
@@ -257,7 +248,6 @@ export default function BeastDetailPage() {
             </p>
           </div>
 
-          {/* Combat Stats: 82 ATTACK / 64 DEFENSE / 91 SPEED */}
           <div className="grid grid-cols-3 gap-4 bg-[#0d0d10] border border-zinc-800 p-4 rounded card-metallic-bevel text-center font-mono">
             <div>
               <span className="text-2xl sm:text-3xl font-bold text-ivory-50 block">{beast.attack || 50}</span>
@@ -273,9 +263,7 @@ export default function BeastDetailPage() {
             </div>
           </div>
 
-          {/* Marketplace Actions Station */}
           <div className="p-5 rounded bg-[#0d0d10] border border-zinc-800 space-y-4 card-metallic-bevel">
-            {/* Scenario 1: Listed & Viewer is NOT owner -> BUY */}
             {isListed && !isOwner && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -300,7 +288,6 @@ export default function BeastDetailPage() {
               </div>
             )}
 
-            {/* Scenario 2: Listed & Viewer IS owner -> CANCEL */}
             {isListed && isOwner && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -322,7 +309,6 @@ export default function BeastDetailPage() {
               </div>
             )}
 
-            {/* Scenario 3: Unlisted & Viewer IS owner -> LIST */}
             {!isListed && isOwner && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
@@ -363,7 +349,6 @@ export default function BeastDetailPage() {
               </div>
             )}
 
-            {/* Scenario 4: Unlisted & Viewer is NOT owner */}
             {!isListed && !isOwner && (
               <div className="text-center py-2">
                 <span className="text-[10px] font-mono text-zinc-400 block uppercase">Status: In Vault</span>
@@ -374,7 +359,6 @@ export default function BeastDetailPage() {
             )}
           </div>
 
-          {/* Secondary Blockchain Metadata */}
           <div className="p-4 rounded bg-[#0d0d10] border border-zinc-800 space-y-2.5 text-xs font-mono">
             <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Blockchain Information</span>
             <div className="flex justify-between items-center text-zinc-400 border-t border-zinc-800/60 pt-2">
@@ -413,7 +397,6 @@ export default function BeastDetailPage() {
             </div>
           </div>
 
-          {/* On-Chain Provenance Ledger Feed */}
           <div className="p-4 rounded bg-[#0d0d10] border border-zinc-800 space-y-2.5">
             <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">Provenance History</span>
             {history.length > 0 ? (
@@ -447,7 +430,6 @@ export default function BeastDetailPage() {
         </div>
       </div>
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={txStep !== "idle"}
         onClose={() => {

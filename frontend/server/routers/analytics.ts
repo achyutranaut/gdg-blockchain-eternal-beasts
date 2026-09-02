@@ -7,7 +7,6 @@ export const analyticsRouter = router({
     const activeListings = await db.getActiveListingsAsync();
     const sales = await db.getSalesAsync();
 
-    // Floor price
     let floorPrice = "0";
     if (activeListings.length > 0 && activeListings[0]) {
       let min = BigInt(activeListings[0].price);
@@ -18,16 +17,13 @@ export const analyticsRouter = router({
       floorPrice = min.toString();
     }
 
-    // Total volume
     let totalVolumeWei = BigInt(0);
     for (const s of sales) {
       totalVolumeWei += BigInt(s.price);
     }
 
-    // Unique owners
     const uniqueOwners = new Set(beasts.map((b) => b.owner.toLowerCase()));
 
-    // Element breakdown
     const elementCounts: Record<string, number> = {};
     for (const b of beasts) {
       elementCounts[b.element] = (elementCounts[b.element] || 0) + 1;
@@ -37,7 +33,6 @@ export const analyticsRouter = router({
       count,
     }));
 
-    // Rarity breakdown
     const rarityCounts: Record<string, number> = {};
     for (const b of beasts) {
       rarityCounts[b.rarity] = (rarityCounts[b.rarity] || 0) + 1;
@@ -47,7 +42,6 @@ export const analyticsRouter = router({
       count,
     }));
 
-    // Volume over time
     const volumeTimeline = [
       { date: "Day 1", volume: 0.12, sales: 2 },
       { date: "Day 2", volume: 0.28, sales: 4 },

@@ -20,7 +20,7 @@ export interface ListingRecord {
   id: string;
   tokenId: string;
   seller: string;
-  price: string; // in wei
+  price: string;
   active: boolean;
   listedAtBlock: number;
   listedTxHash: string;
@@ -84,7 +84,6 @@ export function mergeIndexerBeast(
   };
 }
 
-// Read model database syncing with Ponder indexer API and providing local fallback
 class ReadModelDatabase {
   private beasts: Map<string, BeastRecord> = new Map();
   private listings: Map<string, ListingRecord> = new Map();
@@ -124,7 +123,6 @@ class ReadModelDatabase {
             this.beasts.set(tokenId, mergeIndexerBeast(this.beasts.get(tokenId), incoming));
           }
 
-          // Fetch listings
           try {
             const listRes = await fetch(`${baseUrl}/listings`, { signal: AbortSignal.timeout(2000) });
             if (listRes.ok) {
@@ -147,7 +145,6 @@ class ReadModelDatabase {
             }
           } catch {}
 
-          // Fetch activity
           try {
             const actRes = await fetch(`${baseUrl}/activity`, { signal: AbortSignal.timeout(2000) });
             if (actRes.ok) {
@@ -175,7 +172,6 @@ class ReadModelDatabase {
     }
   }
 
-  // Beast CRUD
   async getBeastAsync(tokenId: string): Promise<BeastRecord | undefined> {
     if (Date.now() - this.lastFetchTime > 3000) {
       await this.syncFromIndexer();
@@ -184,7 +180,6 @@ class ReadModelDatabase {
   }
 
   getBeast(tokenId: string): BeastRecord | undefined {
-    // Trigger background sync if stale
     if (Date.now() - this.lastFetchTime > 3000) {
       this.syncFromIndexer().catch(() => {});
     }
@@ -229,7 +224,6 @@ class ReadModelDatabase {
     this.beasts.set(beast.tokenId, beast);
   }
 
-  // Listing CRUD
   async getListingAsync(tokenId: string): Promise<ListingRecord | undefined> {
     if (Date.now() - this.lastFetchTime > 3000) {
       await this.syncFromIndexer();
@@ -262,7 +256,6 @@ class ReadModelDatabase {
     this.listings.set(listing.tokenId, listing);
   }
 
-  // Sales & Activity
   async getSalesAsync(): Promise<SaleRecord[]> {
     if (Date.now() - this.lastFetchTime > 3000) {
       await this.syncFromIndexer();
@@ -306,5 +299,4 @@ class ReadModelDatabase {
   }
 }
 
-// Global singleton
 export const db = new ReadModelDatabase();

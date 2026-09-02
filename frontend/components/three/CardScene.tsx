@@ -36,7 +36,6 @@ function CardMesh({
   const elementTheme = ELEMENTS[element] || ELEMENTS.Fire;
   const rarityTheme = RARITIES[rarity] || RARITIES.Common;
 
-  // Generate high-fidelity collectible physical trading card canvas texture
   const cardTexture = useMemo(() => {
     if (typeof window === "undefined") return null;
 
@@ -47,42 +46,34 @@ function CardMesh({
     if (!ctx) return null;
 
     const renderCard = (imgEl?: HTMLImageElement) => {
-      // 1. Base Slate & Border Frame
       ctx.fillStyle = "#0c0c0e";
       ctx.fillRect(0, 0, 1024, 1480);
 
-      // Outer bezel line
       ctx.strokeStyle = rarityTheme.name === "Legendary" ? "#d97706" : rarityTheme.name === "Epic" ? "#9333ea" : rarityTheme.name === "Rare" ? "#2563eb" : "#27272a";
       ctx.lineWidth = 14;
       ctx.strokeRect(16, 16, 992, 1448);
 
-      // Inner structural inset line
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
       ctx.lineWidth = 2;
       ctx.strokeRect(36, 36, 952, 1408);
 
-      // 2. Header Bar: Brand + Creature Name + Token #
       ctx.fillStyle = "#141418";
       ctx.fillRect(44, 44, 936, 100);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
       ctx.strokeRect(44, 44, 936, 100);
 
-      // Brand small header
       ctx.font = "bold 16px -apple-system, monospace";
       ctx.fillStyle = "#a1a1aa";
       ctx.fillText("ELEMENTAL BEASTS", 68, 80);
 
-      // Token ID
       ctx.font = "bold 22px -apple-system, monospace";
       ctx.fillStyle = "#d4d4d8";
       ctx.fillText(`#${String(tokenId).padStart(3, "0")}`, 860, 80);
 
-      // Creature Name
       ctx.font = "bold 44px 'Newsreader', Georgia, serif";
       ctx.fillStyle = "#fafaf9";
       ctx.fillText(name.toUpperCase(), 68, 126);
 
-      // 3. Main Artwork Frame
       const artX = 44;
       const artY = 160;
       const artW = 936;
@@ -110,7 +101,6 @@ function CardMesh({
       ctx.lineWidth = 4;
       ctx.strokeRect(artX, artY, artW, artH);
 
-      // 4. Center Identity Ribbon
       ctx.fillStyle = "#121216";
       ctx.fillRect(44, 980, 936, 110);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
@@ -126,7 +116,6 @@ function CardMesh({
       ctx.fillText(`${element.toUpperCase()}`, 512, 1065);
       ctx.textAlign = "left";
 
-      // 5. Tactical Attributes Strip (ATK / DEF / SPD)
       ctx.fillStyle = "#0e0e12";
       ctx.fillRect(44, 1110, 936, 180);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
@@ -150,7 +139,6 @@ function CardMesh({
       });
       ctx.textAlign = "left";
 
-      // 6. Rarity & Protocol Badge Footer
       ctx.fillStyle = "#141418";
       ctx.fillRect(44, 1310, 936, 110);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
@@ -185,7 +173,6 @@ function CardMesh({
   useFrame(() => {
     if (!meshRef.current) return;
 
-    // Natural, restrained physical card tilt
     const targetRotX = isHovered ? -pointerPos.current.y * 0.28 : 0;
     const targetRotY = isHovered ? pointerPos.current.x * 0.28 : 0;
     const targetPosZ = isHovered ? 0.2 : 0;
@@ -197,7 +184,6 @@ function CardMesh({
 
   return (
     <group ref={meshRef}>
-      {/* 3D Physical Card Body */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[2.5, 3.6, 0.05]} />
         <meshStandardMaterial
@@ -207,7 +193,6 @@ function CardMesh({
         />
       </mesh>
 
-      {/* Front Foil Decal Face */}
       {cardTexture && (
         <mesh position={[0, 0, 0.027]}>
           <planeGeometry args={[2.46, 3.55]} />

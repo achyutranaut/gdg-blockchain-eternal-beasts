@@ -20,7 +20,7 @@ const UploadSchema = z.object({
 });
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 export async function POST(req: Request) {
   try {

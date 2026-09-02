@@ -10,6 +10,9 @@ export const listingsRouter = router({
         rarity: z.string().optional(),
         minPrice: z.string().optional(),
         maxPrice: z.string().optional(),
+        minAttack: z.number().optional(),
+        minDefense: z.number().optional(),
+        minSpeed: z.number().optional(),
         sortBy: z.enum(["newest", "price_asc", "price_desc", "rarity"]).optional().default("newest"),
         search: z.string().optional(),
       }).optional()
@@ -60,6 +63,15 @@ export const listingsRouter = router({
             i.beast.description.toLowerCase().includes(q)
         );
       }
+      if (input?.minAttack) {
+        items = items.filter((i) => (i.beast.attack || 50) >= input.minAttack!);
+      }
+      if (input?.minDefense) {
+        items = items.filter((i) => (i.beast.defense || 50) >= input.minDefense!);
+      }
+      if (input?.minSpeed) {
+        items = items.filter((i) => (i.beast.speed || 50) >= input.minSpeed!);
+      }
       if (input?.minPrice) {
         const min = BigInt(input.minPrice);
         items = items.filter((i) => BigInt(i.listing.price) >= min);
@@ -69,7 +81,6 @@ export const listingsRouter = router({
         items = items.filter((i) => BigInt(i.listing.price) <= max);
       }
 
-      // Sort
       const sortBy = input?.sortBy || "newest";
       if (sortBy === "price_asc") {
         items.sort((a, b) => (BigInt(a.listing.price) > BigInt(b.listing.price) ? 1 : -1));
@@ -141,19 +152,16 @@ export const listingsRouter = router({
     )
     .mutation(async ({ input }) => {
       const now = Date.now();
-      // Mark listing inactive
       const existing = await db.getListingAsync(input.tokenId);
       if (existing) {
         db.upsertListing({ ...existing, active: false });
       }
 
-      // Update beast owner
       const beast = await db.getBeastAsync(input.tokenId);
       if (beast) {
         db.upsertBeast({ ...beast, owner: input.buyer, updatedAt: now });
       }
 
-      // Record sale
       const sale = {
         id: `sale_${input.tokenId}_${now}`,
         tokenId: input.tokenId,

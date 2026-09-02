@@ -13,29 +13,21 @@ export const IPFS_GATEWAYS = [
 export function resolveIpfsUrl(uri: string | undefined, gatewayIndex = 0): string {
   if (!uri || uri.trim() === "") return "/placeholder-beast.svg";
 
-  // Local asset paths — pass through unchanged
   if (uri.startsWith("/")) return uri;
-
-  // HTTP(S) URLs — already resolved
   if (uri.startsWith("http://") || uri.startsWith("https://")) return uri;
-
-  // Data URIs (base64 images) and blob URLs — pass through
   if (uri.startsWith("data:") || uri.startsWith("blob:")) return uri;
 
-  // IPFS protocol URIs
   if (uri.startsWith("ipfs://")) {
     const path = uri.replace("ipfs://", "");
     const gateway = IPFS_GATEWAYS[gatewayIndex % IPFS_GATEWAYS.length];
     return `${gateway}${path}`;
   }
 
-  // Raw CID (starts with Qm... or bafy...) — resolve via gateway
   if (uri.startsWith("Qm") || uri.startsWith("bafy")) {
     const gateway = IPFS_GATEWAYS[gatewayIndex % IPFS_GATEWAYS.length];
     return `${gateway}${uri}`;
   }
 
-  // Fallback: treat as relative path
   return uri;
 }
 
