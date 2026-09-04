@@ -192,6 +192,27 @@ Both contracts are verified and deployed on the **Base Sepolia Testnet** (Chain 
 
 ---
 
+---
+
+## 📦 IPFS Implementation
+
+Card images and ERC-721 metadata are stored entirely off-chain on IPFS — the smart contract only ever holds an `ipfs://<CID>` token URI, never raw bytes.
+
+**Pinning (write path)**
+
+- Uploads are pinned via the **Pinata SDK** (`frontend/lib/pinata.ts`) using a server-side JWT — the pinning key is never exposed to the browser.
+- `POST /api/upload` (`frontend/app/api/upload/route.ts`) handles both flows:
+  1. **Custom artwork** — the uploaded file (JPEG/PNG/WEBP/GIF/SVG, ≤10MB, MIME-validated) is pinned first via `pinata.upload.public.file()`, returning an image CID.
+  2. **Built-in beast plates** — pre-pinned once via `scripts/pin-builtin-artworks.mjs`; the route just looks up the CID from `lib/ipfs-cids.ts` rather than re-uploading, avoiding duplicate pins.
+- The ERC-721 JSON metadata object (`name`, `description`, `image`, `attributes`: element/rarity/ATK/DEF/SPD) is assembled server-side and pinned separately via `pinata.upload.public.json()`, returning a metadata CID.
+- The resulting `ipfs://<metadataCid>` is what actually gets passed as the token URI to `mint()` — so the two CIDs (image + metadata) are both immutable and independently verifiable.
+
+**Resolution (read path)**
+
+- `frontend/lib/ipfs.ts` resolves any `ipfs://` URI or raw CID against a **gateway fallback chain** (Pinata gateway → ipfs.io → dweb.link → Cloudflare IPFS), so a single gateway outage doesn't break the gallery.
+- `fetchMetadataFromIpfs()` walks that same fallback chain when loading a card's metadata JSON client-side, with a 3s timeout per gateway attempt.
+- Local asset paths, `data:` URIs, and `blob:` URIs are passed through unchanged, so the resolver is a strict superset — it never breaks non-IPFS assets used elsewhere in the UI (e.g. placeholder art).
+
 ## 🔐 Security Architecture & Invariants
 
 ```mermaid
